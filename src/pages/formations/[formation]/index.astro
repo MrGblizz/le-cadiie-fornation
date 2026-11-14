@@ -1,0 +1,309 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../../layouts/Base.astro';
+import {
+  MODALITES,
+  NIVEAUX,
+  catalogue,
+  formatDuree,
+  formatJours,
+  parcoursContenant,
+  stylesDe,
+  type Formation,
+} from '../../../lib/formations';
+
+export async function getStaticPaths() {
+  const { formations } = await catalogue();
+  return formations.map((f) => ({ params: { formation: f.id }, props: { formation: f } }));
+}
+
+interface Props {
+  formation: Formation;
+}
+const { formation } = Astro.props;
+const { formations, parcours } = await catalogue();
+const d = formation.data;
+const t = formation.temps;
+const css = stylesDe(formation.id);
+const debloque = formations.filter((f) => f.dependances.some((dep) => dep.id === formation.id));
+const dansParcours = parcoursContenant(parcours, formation.id);
+---
+
+<Base titre={d.nom} description={d.resume}>
+  {
+    formation.cours.length > 0 && (
+      <Fragment slot="filtres">
+        <h2>Les cours</h2>
+        <ol>
+          {formation.cours.map((c) => (
+            <li>
+              <a href={c.url}>{c.data.nom}</a>
+            </li>
+          ))}
+        </ol>
+      </Fragment>
+    )
+  }
+
+  {css && <Fragment set:html={`<style data-styles-formation>${css}</style>`} />}
+
+  <article class="formation">
+    <nav class="fil" aria-label="Fil d'Ariane"><a href="/formations/">Formations</a> › {d.nom}</nav>
+
+    <header class="entete-formation">
+      {d.image && <Image src={d.image} alt="" class="couverture" width={900} />}
+      <div class="pastilles">
+        <span class={`pastille niveau-${d.niveau}`}>{NIVEAUX[d.niveau]}</span>
+        <span class="pastille">{formation.cours.length} cours</span>
+        {d.themes.map((th) => <span class="pastille">{th}</span>)}
+      </div>
+      <h1>{d.nom}</h1>
+      <p class="resume">{d.resume}</p>
+
+      {
+        formation.cours.length > 0 && (
+          <dl class="infos">
+            <div>
+              <dt>📖 Lecture totale</dt>
+              <dd>{formatDuree(t.lecture)}</dd>
+            </div>
+            <div>
+              <dt>✍️ En la faisant</dt>
+              <dd>{formatDuree(t.pratique)}</dd>
+            </div>
+            <div>
+              <dt>🎯 Maîtrise</dt>
+              <dd>{formatJours(t.maitrise)} de pratique</dd>
+            </div>
+          </dl>
+        )
+      }
+
+      {
+        formation.modalite && (
+          <p class={`modalite modalite-${formation.modalite}`}>
+            {formation.modalite === 'terrain'
+              ? '⚠️ Au moins un cours doit absolument être accompagné d’une formation de terrain.'
+              : formation.modalite === 'support'
+                ? '🏫 Certains cours sont des supports de formation physique.'
+                : '🏠 Peut entièrement être faite à la maison.'}
+          </p>
+        )
+      }
+
+      {
+        formation.dependances.length > 0 && (
+          <p>
+            <strong>Formations à suivre avant :</strong>
+            {formation.dependances.map((dep, i) => (
+              <>
+                {i > 0 && ', '}
+                <a href={dep.url}>{dep.data.nom}</a>
+              </>
+            ))}
+          </p>
+        )
+      }
+
+      {formation.cours[0] && <a class="bouton" href={formation.cours[0].url}>Commencer la formation →</a>}
+    </header>
+
+    <section class="section">
+      <h2>Programme</h2>
+      {
+        formation.cours.length === 0 ? (
+          <p class="liste-vide">
+            <strong>Aucun cours pour le moment</strong>
+            Les cours de cette formation arrivent bientôt.
+          </p>
+        ) : (
+          <ol class="programme">
+            {formation.cours.map((c) => (
+              <li data-cours={c.id}>
+                <a href={c.url}>
+                  <span class="numero">{c.numero}</span>
+                  <span class="texte">
+                    <strong>{c.data.nom}</strong>
+                    <span class="valide" hidden>
+                      ✓ validé
+                    </span>
+                    <small>{c.data.resume}</small>
+                    <small class="meta">
+                      {NIVEAUX[c.niveau]} · {MODALITES[c.data.modalite].court} · 📖 {formatDuree(c.data.temps.lecture)} · ✍️{' '}
+                      {formatDuree(c.data.temps.pratique)} · 🎯 {formatJours(c.data.temps.maitrise)}
+                    </small>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        )
+      }
+    </section>
+
+    {
+      dansParcours.length > 0 && (
+        <section class="section">
+          <h2>Fait partie des parcours</h2>
+          <ul>
+            {dansParcours.map((p) => (
+              <li>
+                <a href={p.url}>{p.data.titre}</a> — {p.data.resume}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      debloque.length > 0 && (
+        <aside class="suite">
+          <h2>Et ensuite ?</h2>
+          <ul>
+            {debloque.map((f) => (
+              <li>
+                <a href={f.url}>{f.data.nom}</a> — {f.data.resume}
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )
+    }
+  </article>
+</Base>
+
+<script>
+  // Coche les cours dont le quiz de fin a été réussi (mémorisé dans ce navigateur).
+  document.querySelectorAll<HTMLElement>('.programme [data-cours]').forEach((li) => {
+    try {
+      if (localStorage.getItem(`cadiie:valide:${li.dataset.cours}`)) {
+        li.classList.add('est-valide');
+        li.querySelector<HTMLElement>('.valide')!.hidden = false;
+      }
+    } catch {}
+  });
+</script>
+
+<style>
+  .fil {
+    font-size: 0.9rem;
+    color: var(--texte-doux);
+    margin-bottom: 1rem;
+  }
+  .entete-formation {
+    margin-bottom: 2.5rem;
+  }
+  .couverture {
+    width: 100%;
+    height: auto;
+    max-height: 320px;
+    object-fit: cover;
+    border-radius: var(--rayon);
+    margin-bottom: 1rem;
+  }
+  .pastilles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+  h1 {
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    margin: 0.5rem 0;
+  }
+  .resume {
+    font-size: 1.15rem;
+    color: var(--texte-doux);
+    max-width: 65ch;
+  }
+  .infos {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin: 1.25rem 0;
+  }
+  .infos div {
+    background: var(--surface);
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    padding: 0.6rem 0.8rem;
+  }
+  .infos dt {
+    font-size: 0.8rem;
+    color: var(--texte-doux);
+  }
+  .infos dd {
+    margin: 0;
+    font-weight: 700;
+  }
+  .modalite {
+    padding: 0.6rem 0.9rem;
+    border-radius: var(--rayon);
+    background: var(--accent-clair);
+  }
+  .modalite-terrain {
+    background: #fff3cd;
+    font-weight: 600;
+  }
+  .programme {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+  .programme a {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 0.9rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    color: var(--texte);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+  .programme a:hover {
+    border-color: var(--accent);
+  }
+  .numero {
+    flex: none;
+    width: 2.2rem;
+    height: 2.2rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+  }
+  .est-valide .numero {
+    background: var(--ok);
+  }
+  .texte {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+  .texte small {
+    color: var(--texte-doux);
+  }
+  .valide {
+    color: var(--ok);
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+  .suite {
+    background: var(--surface);
+    border: 1px dashed var(--accent);
+    border-radius: var(--rayon);
+    padding: 1rem 1.5rem;
+  }
+  @media (max-width: 640px) {
+    .infos {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

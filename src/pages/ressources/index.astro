@@ -11,7 +11,7 @@ const types = [...new Set(categories.map((c) => c.data.type))].sort((a, b) => a.
 ---
 
 <Base titre="Ressources">
-  <Fragment slot="filtres">
+  {categories.length > 0 && <Fragment slot="filtres">
     <h2>Filtrer les ressources</h2>
     <fieldset>
       <legend>Type</legend>
@@ -29,12 +29,21 @@ const types = [...new Set(categories.map((c) => c.data.type))].sort((a, b) => a.
     </fieldset>
     <p data-compteur></p>
     <button type="button" class="bouton secondaire" data-reinitialiser>Réinitialiser</button>
-  </Fragment>
+  </Fragment>}
 
   <header class="entete-page">
     <h1>Ressources</h1>
     <p>Les outils et liens utiles, rangés par type : graphisme, vidéo, stockage, communication…</p>
   </header>
+
+  {
+    categories.length === 0 && (
+      <p class="liste-vide">
+        <strong>Aucune ressource pour le moment</strong>
+        Les liens utiles seront bientôt rassemblés ici.
+      </p>
+    )
+  }
 
   <div class="grille-2">
     {
@@ -52,5 +61,5 @@ const types = [...new Set(categories.map((c) => c.data.type))].sort((a, b) => a.
       ))
     }
   </div>
-  <p data-aucun-resultat hidden>Aucune catégorie ne correspond à ces filtres.</p>
+  <p class="liste-vide" data-aucun-resultat hidden>Aucune catégorie ne correspond à ces filtres.</p>
 </Base>

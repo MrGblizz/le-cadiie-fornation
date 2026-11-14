@@ -2,12 +2,15 @@
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Couverture from '../components/Couverture.astro';
-import { formatDate, toutesLesFormations } from '../lib/formations';
+import CarteParcours from '../components/CarteParcours.astro';
+import { catalogue, formatDate } from '../lib/formations';
 
 const numeros = (await getCollection('journal')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 const dernier = numeros[0];
-const formations = await toutesLesFormations();
-const pourCommencer = formations.filter((f) => f.data.niveau === 'debutant' && f.data.dependances.length === 0);
+const { formations, parcours } = await catalogue();
+const pourCommencer = formations.filter(
+  (f) => f.data.niveau === 'debutant' && f.dependances.length === 0 && f.cours.length > 0,
+);
 
 // Extrait : les premiers paragraphes du dernier numéro
 const extrait = dernier?.body
@@ -40,6 +43,18 @@ const extrait = dernier?.body
   </section>
 
   {
+    !dernier && (
+      <section class="section">
+        <h2>Le journal</h2>
+        <p class="liste-vide">
+          <strong>Le premier numéro arrive bientôt</strong>
+          Reviens vite pour lire le journal du Cadiie.
+        </p>
+      </section>
+    )
+  }
+
+  {
     dernier && (
       <section class="section">
         <h2>Extrait du journal</h2>
@@ -67,16 +82,19 @@ const extrait = dernier?.body
   }
 
   {
-    pourCommencer.length > 0 && (
+    (parcours.length > 0 || pourCommencer.length > 0) && (
       <section class="section">
         <h2>Pour commencer</h2>
-        <ul class="liste-debut">
-          {pourCommencer.map((f) => (
-            <li>
-              <a href={`/formations/${f.id}/`}>{f.data.nom}</a> — {f.data.resume}
-            </li>
-          ))}
-        </ul>
+        {parcours[0] && <CarteParcours parcours={parcours[0]} />}
+        {pourCommencer.length > 0 && (
+          <ul class="liste-debut">
+            {pourCommencer.map((f) => (
+              <li>
+                <a href={f.url}>{f.data.nom}</a> — {f.data.resume}
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
     )
   }

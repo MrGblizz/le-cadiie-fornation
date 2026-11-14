@@ -1,0 +1,53 @@
+# ============================================================
+#  MODÈLE DE COURS
+#  Copie ce dossier dans formations/<ta-formation>/cours/ et renomme-le.
+#  → adresse : /formations/<ta-formation>/<ton-cours>/
+#  Les chemins (images/, htmls/, sons/, videos/) sont relatifs à ce dossier.
+# ============================================================
+
+nom: Nom du cours
+resume: Une ou deux phrases qui donnent envie.
+image: images/couverture.png          # facultatif
+
+niveau: debutant                      # facultatif : sinon le niveau de la formation
+
+dependances: []                       # cours à faire avant : « cours » (même formation)
+                                      # ou « formation/cours », ex. [syndicalisme/les-bases-du-syndicalisme]
+
+temps:
+  lecture: 20                         # minutes pour le lire
+  pratique: 60                        # minutes pour le faire en le lisant
+  maitrise: 14                        # jours de pratique pour le maîtriser
+
+modalite: maison                      # terrain : doit être accompagné d'une formation de terrain
+                                      # support : support d'une formation physique
+                                      # maison  : peut entièrement être fait à la maison
+
+# Quiz de début : évalue les prérequis. Si le score est sous le seuil,
+# un message invite à réviser les cours « dependance » ratés.
+quiz_debut:
+  seuil: 70                           # % de bonnes réponses
+  questions:
+    - question: Question sur un prérequis ?
+      choix: [Réponse A, Réponse B, Réponse C]
+      reponse: 0                      # index de la bonne réponse (0 = la première)
+      dependance: autre-formation/cours-prerequis
+      explication: Facultatif, affiché après validation.
+
+contenu:
+  - titre: Première partie
+    texte: |
+      Texte en **Markdown** : listes, liens, gras, citations…
+    image: images/schema.png          # facultatif
+    legende: Légende de l'image
+  - titre: Deuxième partie
+    html: htmls/exercice.html         # facultatif : fragment HTML intégré à la page
+    video: https://www.youtube.com/watch?v=XXXXXXXXXXX   # ou PeerTube, ou videos/fichier.mp4
+    son: sons/extrait.mp3             # facultatif
+
+quiz_fin:
+  seuil: 70
+  questions:
+    - question: Question avec plusieurs bonnes réponses ?
+      choix: [A, B, C]
+      reponse: [0, 2]

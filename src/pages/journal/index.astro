@@ -11,18 +11,20 @@ const annees = [...new Set(numeros.map((n) => String(n.data.date.getFullYear()))
 ---
 
 <Base titre="Journal">
-  <Fragment slot="filtres">
+  {numeros.length > 0 && <Fragment slot="filtres">
     <h2>Filtrer le journal</h2>
-    <fieldset>
-      <legend>Sujets</legend>
-      {
-        sujets.map((s) => (
-          <label>
-            <input type="checkbox" data-filtre="sujets" value={slugifier(s)} /> {s}
-          </label>
-        ))
-      }
-    </fieldset>
+    {
+      sujets.length > 0 && (
+        <fieldset>
+          <legend>Sujets</legend>
+          {sujets.map((s) => (
+            <label>
+              <input type="checkbox" data-filtre="sujets" value={slugifier(s)} /> {s}
+            </label>
+          ))}
+        </fieldset>
+      )
+    }
     {
       annees.length > 1 && (
         <fieldset>
@@ -37,14 +39,23 @@ const annees = [...new Set(numeros.map((n) => String(n.data.date.getFullYear()))
     }
     <p data-compteur></p>
     <button type="button" class="bouton secondaire" data-reinitialiser>Réinitialiser</button>
-  </Fragment>
+  </Fragment>}
 
   <header class="entete-page">
     <h1>Le journal</h1>
     <p>Les numéros du journal du Cadiie : actualités, réflexions et comptes rendus de luttes.</p>
   </header>
 
-  <p class="indication">Sens de lecture : du plus récent (en haut à gauche) au plus ancien → puis ↓</p>
+  {
+    numeros.length === 0 && (
+      <p class="liste-vide">
+        <strong>Aucun numéro pour le moment</strong>
+        Le premier numéro du journal arrive bientôt.
+      </p>
+    )
+  }
+
+  {numeros.length > 1 && <p class="indication">Sens de lecture : du plus récent (en haut à gauche) au plus ancien → puis ↓</p>}
 
   <div class="grille-2">
     {
@@ -65,5 +76,5 @@ const annees = [...new Set(numeros.map((n) => String(n.data.date.getFullYear()))
       ))
     }
   </div>
-  <p data-aucun-resultat hidden>Aucun numéro ne correspond à ces filtres.</p>
+  <p class="liste-vide" data-aucun-resultat hidden>Aucun numéro ne correspond à ces filtres.</p>
 </Base>

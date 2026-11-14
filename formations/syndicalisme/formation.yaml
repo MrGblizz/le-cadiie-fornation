@@ -1,0 +1,14 @@
+# Formation : Syndicalisme — regroupe plusieurs cours (dossier cours/)
+nom: Syndicalisme
+resume: Comprendre le syndicalisme et oser prendre la parole dans les instances collectives.
+image: images/couverture.svg
+niveau: debutant
+themes: [Syndicalisme, Droits, Prise de parole]
+dependances: []           # formations à suivre avant
+cours:                    # ordre des cours (noms des dossiers dans cours/)
+  - les-bases-du-syndicalisme
+  - prendre-la-parole-en-ag
+date_ajout: 2026-03-01
+popularite:
+  suivis: 212
+  note: 4.7

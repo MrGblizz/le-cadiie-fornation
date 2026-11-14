@@ -1,9 +1,10 @@
 ---
 import Base from '../../layouts/Base.astro';
 import CarteFormation from '../../components/CarteFormation.astro';
-import { MODALITES, NIVEAUX, estNouvelle, scorePopularite, slugifier, toutesLesFormations } from '../../lib/formations';
+import CarteParcours from '../../components/CarteParcours.astro';
+import { MODALITES, NIVEAUX, catalogue, estNouvelle, scorePopularite, slugifier } from '../../lib/formations';
 
-const formations = await toutesLesFormations();
+const { formations, parcours } = await catalogue();
 
 const populaires = formations
   .filter((f) => scorePopularite(f) > 0)
@@ -18,7 +19,7 @@ const themes = [...new Set(formations.flatMap((f) => f.data.themes))].sort((a, b
 ---
 
 <Base titre="Formations">
-  <Fragment slot="filtres">
+  {formations.length > 0 && <Fragment slot="filtres">
     <h2>Filtrer le catalogue</h2>
     <fieldset>
       <legend>Niveau</legend>
@@ -54,13 +55,14 @@ const themes = [...new Set(formations.flatMap((f) => f.data.themes))].sort((a, b
     }
     <p data-compteur></p>
     <button type="button" class="bouton secondaire" data-reinitialiser>Réinitialiser</button>
-  </Fragment>
+  </Fragment>}
 
   <header class="entete-page">
     <h1>Les formations</h1>
     <p>
-      Chaque formation indique son niveau, ses prérequis, le temps nécessaire et si elle peut se faire seul·e ou doit
-      être accompagnée sur le terrain.
+      Une formation regroupe plusieurs cours. Chacune indique son niveau, ses prérequis, le temps nécessaire et si
+      elle peut se faire seul·e ou doit être accompagnée sur le terrain. Les parcours enchaînent plusieurs formations
+      et cours pour progresser pas à pas.
     </p>
   </header>
 
@@ -90,11 +92,43 @@ const themes = [...new Set(formations.flatMap((f) => f.data.themes))].sort((a, b
     )
   }
 
-  <section class="section">
-    <h2>Catalogue</h2>
-    <div class="grille-2">
-      {formations.map((f) => <CarteFormation formation={f} filtrable badge={estNouvelle(f) ? 'Nouveau' : undefined} />)}
-    </div>
-    <p data-aucun-resultat hidden>Aucune formation ne correspond à ces filtres.</p>
-  </section>
+  {
+    parcours.length > 0 && (
+      <section class="section">
+        <h2>Parcours</h2>
+        <div class="liste-parcours">
+          {parcours.map((p) => (
+            <CarteParcours parcours={p} />
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  {
+    formations.length > 0 ? (
+      <section class="section">
+        <h2>Catalogue des formations</h2>
+        <div class="grille-2">
+          {formations.map((f) => (
+            <CarteFormation formation={f} filtrable badge={estNouvelle(f) ? 'Nouveau' : undefined} />
+          ))}
+        </div>
+        <p class="liste-vide" data-aucun-resultat hidden>Aucune formation ne correspond à ces filtres.</p>
+      </section>
+    ) : (
+      <p class="liste-vide">
+        <strong>Aucune formation pour le moment</strong>
+        Les premières formations arrivent bientôt. En attendant, jette un œil au <a href="/journal/">journal</a> et aux{' '}
+        <a href="/ressources/">ressources</a>.
+      </p>
+    )
+  }
 </Base>
+
+<style>
+  .liste-parcours {
+    display: grid;
+    gap: 1rem;
+  }
+</style>

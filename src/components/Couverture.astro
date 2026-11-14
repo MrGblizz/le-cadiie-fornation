@@ -63,6 +63,8 @@ const dataFiltres = Object.fromEntries(Object.entries(filtres).map(([k, v]) => [
     box-shadow: 4px 4px 0 var(--bordure);
     transition: transform 0.15s;
     overflow: hidden;
+    overflow-wrap: anywhere;
+    min-width: 0;
   }
   .couverture:hover {
     transform: rotate(-0.6deg) translateY(-3px);

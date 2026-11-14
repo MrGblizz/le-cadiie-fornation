@@ -1,0 +1,14 @@
+# Formation : Mobilisation
+nom: Mobilisation
+resume: Passer de l'idée à l'action collective — planifier, mobiliser, agir.
+image: images/couverture.svg
+niveau: avance
+themes: [Mobilisation, Organisation]
+dependances:
+  - syndicalisme
+cours:
+  - organiser-une-action
+date_ajout: 2026-06-20
+popularite:
+  suivis: 87
+  note: 4.8

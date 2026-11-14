@@ -17,33 +17,65 @@ npm run preview   # prévisualise le build
 
 ## Où se trouve le contenu ?
 
+Trois niveaux :
+
+- **Parcours** : enchaîne des formations entières et/ou des cours seuls (ex. « La base du militantisme »).
+- **Formation** : regroupe plusieurs cours sur un même sujet.
+- **Cours** : le contenu lui-même, avec son quiz de début et de fin.
+
 ```
-formations/                     ← une formation = un dossier
-  nom_formation/
-    formation.yaml              ← toute la formation (infos, quiz, contenu)
-    styles/                     ← CSS facultatif qui écrase le style du site sur cette formation
-    htmls/                      ← fragments HTML intégrés au contenu (champ `html:`)
-    sons/                       ← sons (champ `son:`)
-    images/                     ← images (champs `image:`)
-    videos/                     ← (facultatif) vidéos locales ; sinon un lien YouTube/PeerTube
+formations/
+  nom_formation/                ← une formation
+    formation.yaml              ← infos de la formation + ordre des cours
+    images/                     ← image de présentation de la formation
+    styles/                     ← CSS facultatif (s'applique à la formation et à tous ses cours)
+    cours/
+      nom_cours/                ← un cours
+        cours.yaml              ← infos, quiz de début, contenu, quiz de fin
+        styles/                 ← CSS facultatif propre au cours
+        htmls/                  ← fragments HTML facultatifs (champ `html:`)
+        sons/                   ← sons (champ `son:`)
+        images/                 ← images (champs `image:`)
+        videos/                 ← (facultatif) vidéos locales ; sinon un lien YouTube/PeerTube
 contenu/
-  journal/*.md                  ← un fichier Markdown par numéro
+  parcours/*.yaml               ← un parcours par fichier
+  journal/*.md                  ← un numéro du journal par fichier
   ressources/*.yaml             ← une catégorie de ressources par fichier
-docs/modele-formation/          ← modèle commenté à copier pour créer une formation
+docs/modele-formation/          ← modèle commenté (formation + cours) à copier
 ```
 
-### Ajouter une formation
+Adresses : `/formations/<formation>/`, `/formations/<formation>/<cours>/`, `/parcours/<parcours>/`.
+
+### Ajouter une formation et ses cours
 
 1. Copier `docs/modele-formation/` dans `formations/` et renommer le dossier (`formations/ma-formation`).
-2. Remplir `formation.yaml` (tous les champs sont expliqués dans le modèle).
-3. Le site vérifie le fichier au lancement : un champ manquant, une dépendance inconnue ou un fichier introuvable
-   provoque une erreur explicite.
+2. Remplir `formation.yaml` (nom, résumé, niveau, thèmes, formations prérequises, ordre des cours…).
+3. Pour chaque cours, copier `cours/modele-de-cours/` et le renommer, puis remplir `cours.yaml`.
+4. Le site vérifie tout au lancement : champ manquant, cours ou dépendance inconnue, fichier introuvable
+   → erreur explicite.
 
-Champs principaux : `nom`, `resume`, `image`, `niveau` (debutant/intermediaire/avance), `dependances`,
-`temps` (lecture, pratique, maitrise), `modalite` (terrain/support/maison), `quiz_debut`, `contenu`, `quiz_fin`.
+Le temps total d'une formation (lecture, pratique, maîtrise) et sa modalité (la plus exigeante de ses cours)
+sont calculés automatiquement.
 
-Le **quiz de début** évalue les prérequis : chaque question peut indiquer la `dependance` qu'elle teste.
-Sous le seuil, un message invite à réviser les formations correspondantes (avec liens).
+Pour désigner un cours (dépendances, quiz, parcours) : `nom-du-cours` s'il est dans la même formation,
+sinon `formation/nom-du-cours`.
+
+Le **quiz de début** d'un cours évalue les prérequis : chaque question peut indiquer la `dependance` qu'elle
+teste. Sous le seuil, un message invite à réviser les cours correspondants (avec liens). Réussir le **quiz de
+fin** marque le cours comme validé dans le programme de la formation (mémorisé dans le navigateur).
+
+### Ajouter un parcours
+
+Créer `contenu/parcours/mon-parcours.yaml` :
+
+```yaml
+titre: La base du militantisme
+resume: Le parcours idéal pour débuter.
+etapes:
+  - formation: syndicalisme                  # une formation entière
+  - cours: communication/creer-une-affiche   # un cours seul
+    note: Commentaire facultatif affiché sur l'étape.
+```
 
 ### Sections « plus suivies » et « nouvelles »
 

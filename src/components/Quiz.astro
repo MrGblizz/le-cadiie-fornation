@@ -6,24 +6,28 @@ interface Question {
   explication?: string;
   dependance?: string;
 }
+import { resoudreCours } from '../lib/formations';
+
 interface Props {
   type: 'debut' | 'fin';
-  formation: string; // id de la formation
+  cours: string; // identifiant complet « formation/cours »
   quiz: { seuil: number; questions: Question[] };
-  dependances?: { id: string; nom: string }[];
+  /** Cours à réviser en cas d'échec au quiz de début. */
+  dependances?: { id: string; nom: string; url: string }[];
 }
 
-const { type, formation, quiz, dependances = [] } = Astro.props;
+const { type, cours, quiz, dependances = [] } = Astro.props;
+const formationId = cours.split('/')[0];
 
 const correction = quiz.questions.map((q) => ({
   reponses: ([] as number[]).concat(q.reponse),
-  dependance: q.dependance ?? null,
+  dependance: q.dependance ? resoudreCours(q.dependance, formationId) : null,
   explication: q.explication ?? null,
 }));
-const titre = type === 'debut' ? 'Quiz de début : es-tu prêt·e ?' : 'Quiz de fin de formation';
+const titre = type === 'debut' ? 'Quiz de début : es-tu prêt·e ?' : 'Quiz de fin de cours';
 const intro =
   type === 'debut'
-    ? 'Ce petit quiz vérifie que tu as les bases nécessaires (les formations prérequises) avant de commencer.'
+    ? 'Ce petit quiz vérifie que tu as les bases nécessaires (les cours prérequis) avant de commencer.'
     : 'Vérifie ce que tu as retenu. Tu peux recommencer autant de fois que tu veux.';
 ---
 
@@ -31,7 +35,7 @@ const intro =
   class={`quiz quiz-${type}`}
   id={`quiz-${type}`}
   data-quiz={type}
-  data-formation={formation}
+  data-cours={cours}
   data-seuil={quiz.seuil}
   data-correction={JSON.stringify(correction)}
   data-dependances={JSON.stringify(dependances)}
@@ -74,10 +78,10 @@ const intro =
 
   document.querySelectorAll<HTMLElement>('[data-quiz]').forEach((bloc) => {
     const type = bloc.dataset.quiz as 'debut' | 'fin';
-    const formation = bloc.dataset.formation!;
+    const cours = bloc.dataset.cours!;
     const seuil = Number(bloc.dataset.seuil);
     const correction: Correction[] = JSON.parse(bloc.dataset.correction!);
-    const dependances: { id: string; nom: string }[] = JSON.parse(bloc.dataset.dependances!);
+    const dependances: { id: string; nom: string; url: string }[] = JSON.parse(bloc.dataset.dependances!);
     const form = bloc.querySelector('form')!;
     const resultat = bloc.querySelector<HTMLElement>('.resultat')!;
 
@@ -109,19 +113,19 @@ const intro =
           html += '<p>✅ Tu as les bases nécessaires. Bonne formation !</p>';
         } else {
           const aReviser = dependances.filter((d) => depsRatees.size === 0 || depsRatees.has(d.id));
-          html += '<p>📚 <strong>Il te manque quelques bases.</strong> Nous t’invitons à réviser avant de commencer cette formation';
+          html += '<p>📚 <strong>Il te manque quelques bases.</strong> Nous t’invitons à réviser avant de commencer ce cours';
           html += aReviser.length
             ? ' :</p><ul>' +
-              aReviser.map((d) => `<li><a href="/formations/${d.id}/">${echapper(d.nom)}</a></li>`).join('') +
+              aReviser.map((d) => `<li><a href="${d.url}">${echapper(d.nom)}</a></li>`).join('') +
               '</ul>'
             : '.</p>';
-          html += '<p><small>Tu peux quand même continuer, mais la formation sera plus difficile à suivre.</small></p>';
+          html += '<p><small>Tu peux quand même continuer, mais le cours sera plus difficile à suivre.</small></p>';
         }
       } else {
         if (reussi) {
-          html += '<p>🎉 <strong>Formation validée !</strong> Il ne reste plus qu’à pratiquer.</p>';
+          html += '<p>🎉 <strong>Cours validé !</strong> Il ne reste plus qu’à pratiquer.</p>';
           try {
-            localStorage.setItem(`cadiie:validee:${formation}`, new Date().toISOString());
+            localStorage.setItem(`cadiie:valide:${cours}`, new Date().toISOString());
           } catch {}
         } else {
           html += '<p>Relis les sections où tu t’es trompé·e, puis retente le quiz.</p>';

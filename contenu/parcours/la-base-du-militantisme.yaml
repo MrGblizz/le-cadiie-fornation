@@ -1,0 +1,11 @@
+# Parcours : enchaîne des formations entières et/ou des cours seuls, dans l'ordre.
+titre: La base du militantisme
+resume: Le parcours idéal pour débuter — comprendre, prendre la parole, communiquer puis passer à l'action.
+couleur: "#c62828"
+ordre: 1
+etapes:
+  - formation: syndicalisme            # une formation entière (tous ses cours)
+    note: Commence par ici, c'est le socle de tout le reste.
+  - cours: communication/creer-une-affiche   # un cours seul : « formation/cours »
+    note: Juste ce cours suffit pour débuter en communication.
+  - formation: mobilisation

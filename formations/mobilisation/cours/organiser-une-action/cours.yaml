@@ -1,21 +1,16 @@
-# Formation : Organiser une action
+# Cours : Organiser une action
 nom: Organiser une action
 resume: De l'idée au jour J — planifier, mobiliser et sécuriser une action collective (rassemblement, distribution de tracts…).
 image: images/couverture.svg
 niveau: avance
-themes: [Mobilisation, Organisation]
 dependances:
-  - les-bases-du-syndicalisme
-  - prendre-la-parole-en-ag
+  - syndicalisme/les-bases-du-syndicalisme
+  - syndicalisme/prendre-la-parole-en-ag
 temps:
   lecture: 40
   pratique: 180
   maitrise: 60
-modalite: terrain   # doit absolument être accompagnée d'une formation de terrain
-date_ajout: 2026-06-20
-popularite:
-  suivis: 87
-  note: 4.8
+modalite: terrain   # doit absolument être accompagné d'une formation de terrain
 
 quiz_debut:
   seuil: 70
@@ -25,13 +20,13 @@ quiz_debut:
         - Constat, argument, proposition
         - Introduction, développement, conclusion, annexe
       reponse: 0
-      dependance: prendre-la-parole-en-ag
+      dependance: syndicalisme/prendre-la-parole-en-ag
     - question: Pourquoi s'organiser collectivement ?
       choix:
         - Parce qu'ensemble on pèse davantage
         - Parce que c'est obligatoire
       reponse: 0
-      dependance: les-bases-du-syndicalisme
+      dependance: syndicalisme/les-bases-du-syndicalisme
 
 contenu:
   - titre: Définir un objectif clair

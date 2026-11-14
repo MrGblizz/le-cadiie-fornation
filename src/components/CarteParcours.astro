@@ -1,0 +1,101 @@
+---
+import { formatDuree, formatJours, type Parcours } from '../lib/formations';
+
+interface Props {
+  parcours: Parcours;
+}
+const { parcours } = Astro.props;
+const d = parcours.data;
+---
+
+<a class="carte-parcours" href={parcours.url} style={d.couleur ? `--couleur-parcours: ${d.couleur}` : undefined}>
+  <div class="entete">
+    <span class="etiquette">Parcours</span>
+    <h3>{d.titre}</h3>
+    <p>{d.resume}</p>
+  </div>
+  <ol class="etapes">
+    {
+      parcours.etapes.map((e) => (
+        <li>
+          {e.type === 'formation' ? (
+            <>
+              <strong>{e.formation.data.nom}</strong> <small>formation · {e.formation.cours.length} cours</small>
+            </>
+          ) : (
+            <>
+              <strong>{e.cours.data.nom}</strong> <small>cours</small>
+            </>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+  <p class="total">
+    {parcours.nbCours} cours · 📖 {formatDuree(parcours.temps.lecture)} · ✍️ {formatDuree(parcours.temps.pratique)} · 🎯
+    {formatJours(parcours.temps.maitrise)}
+  </p>
+</a>
+
+<style>
+  .carte-parcours {
+    --couleur-parcours: var(--accent);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0.5rem 1.5rem;
+    padding: 1.2rem 1.4rem;
+    background: var(--surface);
+    border: 1px solid var(--bordure);
+    border-left: 8px solid var(--couleur-parcours);
+    border-radius: var(--rayon);
+    color: var(--texte);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+    transition: box-shadow 0.15s;
+  }
+  .carte-parcours:hover {
+    box-shadow: 0 8px 20px rgb(0 0 0 / 0.08);
+  }
+  .etiquette {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--couleur-parcours);
+  }
+  h3 {
+    margin: 0.2rem 0 0.4rem;
+    font-size: 1.4rem;
+  }
+  .entete p {
+    margin: 0;
+    color: var(--texte-doux);
+    font-size: 0.92rem;
+  }
+  .etapes {
+    margin: 0;
+    padding-left: 1.3rem;
+    font-size: 0.92rem;
+  }
+  .etapes li {
+    margin: 0.2rem 0;
+  }
+  .etapes li::marker {
+    color: var(--couleur-parcours);
+    font-weight: 700;
+  }
+  .etapes small {
+    color: var(--texte-doux);
+  }
+  .total {
+    grid-column: 1 / -1;
+    margin: 0.3rem 0 0;
+    font-size: 0.82rem;
+    color: var(--texte-doux);
+  }
+  @media (max-width: 800px) {
+    .carte-parcours {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

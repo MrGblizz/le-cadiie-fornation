@@ -1,0 +1,10 @@
+# Formation : Communication militante
+nom: Communication militante
+resume: Faire passer un message clairement — affiches, visuels et supports de mobilisation.
+image: images/couverture.svg
+niveau: debutant
+themes: [Communication, Graphisme]
+dependances: []
+cours:
+  - creer-une-affiche
+date_ajout: 2026-11-02   # récente : apparaît dans « Nouvelles formations »

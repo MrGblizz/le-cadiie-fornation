@@ -1,16 +1,14 @@
-# Formation : Créer une affiche militante
+# Cours : Créer une affiche militante
 nom: Créer une affiche militante
 resume: Concevoir une affiche lisible et percutante avec des logiciels libres.
 image: images/couverture.svg
 niveau: debutant
-themes: [Communication, Graphisme]
 dependances: []
 temps:
   lecture: 15
   pratique: 60
   maitrise: 10
 modalite: maison
-date_ajout: 2026-11-02   # récente : apparaît dans « Nouvelles formations »
 
 contenu:
   - titre: Une affiche, ça se lit en 3 secondes

@@ -1,37 +1,48 @@
 ---
-import type { CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
-import Base from '../../layouts/Base.astro';
-import Quiz from '../../components/Quiz.astro';
+import Base from '../../../layouts/Base.astro';
+import Quiz from '../../../components/Quiz.astro';
 import {
   MODALITES,
   NIVEAUX,
+  catalogue,
   formatDuree,
   formatJours,
   fragmentHtml,
   markdown,
   media,
-  stylesFormation,
-  toutesLesFormations,
+  resoudreCours,
+  stylesDe,
   video,
-} from '../../lib/formations';
+  type Cours,
+} from '../../../lib/formations';
 
 export async function getStaticPaths() {
-  const formations = await toutesLesFormations();
-  return formations.map((f) => ({ params: { slug: f.id }, props: { formation: f, toutes: formations } }));
+  const { cours } = await catalogue();
+  return cours.map((c) => ({ params: { formation: c.formation.id, cours: c.slug }, props: { cours: c } }));
 }
 
 interface Props {
-  formation: CollectionEntry<'formations'>;
-  toutes: CollectionEntry<'formations'>[];
+  cours: Cours;
 }
-const { formation, toutes } = Astro.props;
-const d = formation.data;
-const id = formation.id;
+const { cours } = Astro.props;
+const { cours: tousLesCours } = await catalogue();
+const d = cours.data;
+const formation = cours.formation;
+const id = cours.id;
 
-const dependances = d.dependances.map((dep) => toutes.find((f) => f.id === dep)!);
-const debloque = toutes.filter((f) => f.data.dependances.includes(id));
-const css = stylesFormation(id);
+// CSS de la formation puis du cours (le second l'emporte)
+const css = [stylesDe(formation.id), stylesDe(id)].filter(Boolean).join('\n');
+
+// Cours à réviser si le quiz de début échoue : prérequis + cours cités dans les questions
+const aReviser = new Map(cours.dependances.map((c) => [c.id, c]));
+for (const q of d.quiz_debut?.questions ?? []) {
+  if (!q.dependance) continue;
+  const c = tousLesCours.find((x) => x.id === resoudreCours(q.dependance!, formation.id));
+  if (c) aReviser.set(c.id, c);
+}
+
+const debloque = tousLesCours.filter((c) => c.dependances.some((dep) => dep.id === id));
 
 const sections = d.contenu.map((s, i) => ({
   ancre: `section-${i + 1}`,
@@ -45,12 +56,9 @@ const sections = d.contenu.map((s, i) => ({
 }));
 ---
 
-<Base titre={d.nom} description={d.resume}>
-  {/* Placé dans le corps (et non dans <head>) pour passer après le CSS global et bien l'écraser. */}
-  {css && <Fragment set:html={`<style data-formation-style>${css}</style>`} />}
-
+<Base titre={`${d.nom} · ${formation.data.nom}`} description={d.resume}>
   <Fragment slot="filtres">
-    <h2>Sommaire</h2>
+    <h2>Dans ce cours</h2>
     <ol>
       {d.quiz_debut && <li><a href="#quiz-debut">Quiz de début</a></li>}
       {
@@ -62,16 +70,33 @@ const sections = d.contenu.map((s, i) => ({
       }
       {d.quiz_fin && <li><a href="#quiz-fin">Quiz de fin</a></li>}
     </ol>
+    <h2 class="titre-formation">Formation : {formation.data.nom}</h2>
+    <ol class="cours-formation">
+      {
+        formation.cours.map((c) => (
+          <li>
+            {c.id === id ? <strong>{c.data.nom}</strong> : <a href={c.url}>{c.data.nom}</a>}
+          </li>
+        ))
+      }
+    </ol>
   </Fragment>
 
-  <article class={`formation formation-${id}`}>
-    <p><a href="/formations/">← Toutes les formations</a></p>
+  {/* Placé dans le corps (et non dans <head>) pour passer après le CSS global et bien l'écraser. */}
+  {css && <Fragment set:html={`<style data-styles-cours>${css}</style>`} />}
 
-    <header class="entete-formation">
+  <article class="cours">
+    <nav class="fil" aria-label="Fil d'Ariane">
+      <a href="/formations/">Formations</a> › <a href={formation.url}>{formation.data.nom}</a> › Cours {cours.numero}/{
+        formation.cours.length
+      }
+    </nav>
+
+    <header class="entete-cours">
       {d.image && <Image src={d.image} alt="" class="couverture" width={900} />}
       <div class="pastilles">
-        <span class={`pastille niveau-${d.niveau}`}>{NIVEAUX[d.niveau]}</span>
-        {d.themes.map((t) => <span class="pastille">{t}</span>)}
+        <span class={`pastille niveau-${cours.niveau}`}>{NIVEAUX[cours.niveau]}</span>
+        <span class="pastille">Cours {cours.numero} de la formation « {formation.data.nom} »</span>
       </div>
       <h1>{d.nom}</h1>
       <p class="resume">{d.resume}</p>
@@ -82,7 +107,7 @@ const sections = d.contenu.map((s, i) => ({
           <dd>{formatDuree(d.temps.lecture)}</dd>
         </div>
         <div>
-          <dt>✍️ En la faisant</dt>
+          <dt>✍️ En le faisant</dt>
           <dd>{formatDuree(d.temps.pratique)}</dd>
         </div>
         <div>
@@ -97,13 +122,14 @@ const sections = d.contenu.map((s, i) => ({
       </p>
 
       {
-        dependances.length > 0 && (
+        cours.dependances.length > 0 && (
           <p class="prerequis">
             <strong>Prérequis :</strong>
-            {dependances.map((dep, i) => (
+            {cours.dependances.map((dep, i) => (
               <>
                 {i > 0 && ', '}
-                <a href={`/formations/${dep.id}/`}>{dep.data.nom}</a>
+                <a href={dep.url}>{dep.data.nom}</a>
+                {dep.formation.id !== formation.id && <small> ({dep.formation.data.nom})</small>}
               </>
             ))}
           </p>
@@ -115,16 +141,16 @@ const sections = d.contenu.map((s, i) => ({
       d.quiz_debut && (
         <Quiz
           type="debut"
-          formation={id}
+          cours={id}
           quiz={d.quiz_debut}
-          dependances={dependances.map((dep) => ({ id: dep.id, nom: dep.data.nom }))}
+          dependances={[...aReviser.values()].map((c) => ({ id: c.id, nom: c.data.nom, url: c.url }))}
         />
       )
     }
 
     {
       sections.map((s) => (
-        <section class="section-formation" id={s.ancre}>
+        <section class="section-cours" id={s.ancre}>
           <h2>{s.titre}</h2>
           {s.texte && <div class="prose" set:html={s.texte} />}
           {s.html && <div class="fragment-html" set:html={s.html} />}
@@ -151,17 +177,32 @@ const sections = d.contenu.map((s, i) => ({
       ))
     }
 
-    {d.quiz_fin && <Quiz type="fin" formation={id} quiz={d.quiz_fin} />}
+    {d.quiz_fin && <Quiz type="fin" cours={id} quiz={d.quiz_fin} />}
+
+    <nav class="suivant-precedent" aria-label="Cours de la formation">
+      {cours.precedent ? <a class="bouton secondaire" href={cours.precedent.url}>← {cours.precedent.data.nom}</a> : <span />}
+      {
+        cours.suivant ? (
+          <a class="bouton" href={cours.suivant.url}>
+            Cours suivant : {cours.suivant.data.nom} →
+          </a>
+        ) : (
+          <a class="bouton" href={formation.url}>
+            Fin de la formation ✓
+          </a>
+        )
+      }
+    </nav>
 
     {
       debloque.length > 0 && (
         <aside class="suite">
           <h2>Et ensuite ?</h2>
-          <p>Cette formation ouvre la voie à :</p>
+          <p>Ce cours ouvre la voie à :</p>
           <ul>
-            {debloque.map((f) => (
+            {debloque.map((c) => (
               <li>
-                <a href={`/formations/${f.id}/`}>{f.data.nom}</a> — {f.data.resume}
+                <a href={c.url}>{c.data.nom}</a> <small>({c.formation.data.nom})</small> — {c.data.resume}
               </li>
             ))}
           </ul>
@@ -172,7 +213,12 @@ const sections = d.contenu.map((s, i) => ({
 </Base>
 
 <style>
-  .entete-formation {
+  .fil {
+    font-size: 0.9rem;
+    color: var(--texte-doux);
+    margin-bottom: 1rem;
+  }
+  .entete-cours {
     margin-bottom: 2.5rem;
   }
   .couverture {
@@ -226,10 +272,10 @@ const sections = d.contenu.map((s, i) => ({
     background: #fff3cd;
     font-weight: 600;
   }
-  .section-formation {
+  .section-cours {
     margin: 0 0 2.5rem;
   }
-  .section-formation h2 {
+  .section-cours h2 {
     font-size: 1.6rem;
     border-bottom: 2px solid var(--accent);
     padding-bottom: 0.3rem;
@@ -264,11 +310,21 @@ const sections = d.contenu.map((s, i) => ({
     width: 100%;
     margin: 1rem 0;
   }
+  .suivant-precedent {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin: 0 0 2.5rem;
+  }
   .suite {
     background: var(--surface);
     border: 1px dashed var(--accent);
     border-radius: var(--rayon);
     padding: 1rem 1.5rem;
+  }
+  .titre-formation {
+    margin-top: 1.2rem !important;
   }
   @media (max-width: 640px) {
     .infos {

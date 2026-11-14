@@ -21,6 +21,8 @@ const d = categorie.data;
     <p>{d.description}</p>
   </header>
 
+  {d.liens.length === 0 && <p class="liste-vide"><strong>Aucun lien pour le moment</strong>Cette catégorie sera bientôt remplie.</p>}
+
   <ul class="liens grille-2">
     {
       d.liens.map((l) => (

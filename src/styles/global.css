@@ -197,6 +197,9 @@ h3 {
   padding-top: 1rem;
   font-size: 0.92rem;
 }
+.filtres:not(:has(*)) {
+  display: none; /* aucun filtre à afficher (ex. liste vide) */
+}
 .filtres h2 {
   font-family: var(--police);
   font-size: 0.75rem;
@@ -312,6 +315,23 @@ h3 {
 .pastille.nouveau {
   background: var(--accent);
   color: #fff;
+}
+
+/* Message affiché quand une liste est vide */
+.liste-vide {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  color: var(--texte-doux);
+  background: var(--surface);
+  border: 2px dashed var(--bordure);
+  border-radius: var(--rayon);
+}
+.liste-vide strong {
+  display: block;
+  font-family: var(--police-titre);
+  font-size: 1.3rem;
+  color: var(--texte);
+  margin-bottom: 0.3rem;
 }
 
 .indication {

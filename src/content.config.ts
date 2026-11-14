@@ -1,8 +1,15 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
+/*
+  Organisation :
+    Parcours  (contenu/parcours/*.yaml)      regroupe des formations et/ou des cours
+    Formation (formations/<f>/formation.yaml) regroupe plusieurs cours
+    Cours     (formations/<f>/cours/<c>/cours.yaml) contenu + quiz
+*/
+
 /* ------------------------------------------------------------------ */
-/*  Quiz (début et fin de formation)                                   */
+/*  Quiz (début et fin de cours)                                       */
 /* ------------------------------------------------------------------ */
 const question = z.object({
   question: z.string(),
@@ -10,7 +17,7 @@ const question = z.object({
   /** Index (à partir de 0) de la bonne réponse, ou liste d'index si plusieurs. */
   reponse: z.union([z.number().int(), z.array(z.number().int()).min(1)]),
   explication: z.string().optional(),
-  /** Identifiant (nom du dossier) de la formation prérequise que la question évalue. */
+  /** Cours prérequis évalué par la question (ex. « mon-cours » ou « autre-formation/son-cours »). */
   dependance: z.string().optional(),
 });
 
@@ -20,40 +27,29 @@ const quiz = z.object({
   questions: z.array(question).min(1),
 });
 
+const niveau = z.enum(['debutant', 'intermediaire', 'avance']);
+
 /* ------------------------------------------------------------------ */
-/*  Formations : un dossier par formation, fichier formation.yaml      */
+/*  Formations : formations/<formation>/formation.yaml                 */
 /* ------------------------------------------------------------------ */
 const formations = defineCollection({
   loader: glob({
     base: './formations',
     pattern: '*/formation.{yaml,yml}',
-    // l'identifiant d'une formation = le nom de son dossier
+    // identifiant = nom du dossier
     generateId: ({ entry }) => entry.split('/')[0],
   }),
   schema: ({ image }) =>
     z.object({
       nom: z.string(),
       resume: z.string(),
-      /** Chemin relatif au fichier formation.yaml, ex. images/couverture.svg */
       image: image().optional(),
-      niveau: z.enum(['debutant', 'intermediaire', 'avance']),
+      niveau,
       themes: z.array(z.string()).default([]),
-      /** Identifiants (noms de dossier) des formations à suivre avant. */
+      /** Formations (noms de dossier) à suivre avant celle-ci. */
       dependances: z.array(z.string()).default([]),
-      temps: z.object({
-        /** Minutes pour simplement la lire. */
-        lecture: z.number().positive(),
-        /** Minutes pour la faire en la lisant (exercices compris). */
-        pratique: z.number().positive(),
-        /** Jours de pratique pour la maîtriser complètement. */
-        maitrise: z.number().positive(),
-      }),
-      /**
-       * terrain : doit absolument être accompagnée d'une formation de terrain
-       * support : est un support de formation physique
-       * maison  : peut entièrement être faite à la maison
-       */
-      modalite: z.enum(['terrain', 'support', 'maison']),
+      /** Ordre des cours (noms des dossiers dans cours/). Par défaut : ordre alphabétique. */
+      cours: z.array(z.string()).optional(),
       date_ajout: z.coerce.date().optional(),
       /** Saisi à la main pour l'instant (pas de base de données). */
       popularite: z
@@ -62,6 +58,45 @@ const formations = defineCollection({
           note: z.number().min(0).max(5).default(0),
         })
         .optional(),
+    }),
+});
+
+/* ------------------------------------------------------------------ */
+/*  Cours : formations/<formation>/cours/<cours>/cours.yaml            */
+/* ------------------------------------------------------------------ */
+const cours = defineCollection({
+  loader: glob({
+    base: './formations',
+    pattern: '*/cours/*/cours.{yaml,yml}',
+    // identifiant = « formation/cours »
+    generateId: ({ entry }) => {
+      const [formation, , dossier] = entry.split('/');
+      return `${formation}/${dossier}`;
+    },
+  }),
+  schema: ({ image }) =>
+    z.object({
+      nom: z.string(),
+      resume: z.string(),
+      image: image().optional(),
+      /** Par défaut : le niveau de la formation. */
+      niveau: niveau.optional(),
+      /** Cours à faire avant (« cours » de la même formation ou « formation/cours »). */
+      dependances: z.array(z.string()).default([]),
+      temps: z.object({
+        /** Minutes pour simplement le lire. */
+        lecture: z.number().positive(),
+        /** Minutes pour le faire en le lisant (exercices compris). */
+        pratique: z.number().positive(),
+        /** Jours de pratique pour le maîtriser complètement. */
+        maitrise: z.number().positive(),
+      }),
+      /**
+       * terrain : doit absolument être accompagné d'une formation de terrain
+       * support : est un support de formation physique
+       * maison  : peut entièrement être fait à la maison
+       */
+      modalite: z.enum(['terrain', 'support', 'maison']),
       quiz_debut: quiz.optional(),
       contenu: z
         .array(
@@ -81,6 +116,30 @@ const formations = defineCollection({
         )
         .min(1),
       quiz_fin: quiz.optional(),
+    }),
+});
+
+/* ------------------------------------------------------------------ */
+/*  Parcours : contenu/parcours/*.yaml                                 */
+/* ------------------------------------------------------------------ */
+const parcours = defineCollection({
+  loader: glob({ base: './contenu/parcours', pattern: '*.{yaml,yml}' }),
+  schema: ({ image }) =>
+    z.object({
+      titre: z.string(),
+      resume: z.string(),
+      image: image().optional(),
+      couleur: z.string().optional(),
+      ordre: z.number().default(100),
+      /** Étapes dans l'ordre : une formation entière ou un cours seul. */
+      etapes: z
+        .array(
+          z.union([
+            z.object({ formation: z.string(), note: z.string().optional() }),
+            z.object({ cours: z.string(), note: z.string().optional() }),
+          ]),
+        )
+        .min(1),
     }),
 });
 
@@ -129,4 +188,4 @@ const ressources = defineCollection({
   }),
 });
 
-export const collections = { formations, journal, ressources };
+export const collections = { formations, cours, parcours, journal, ressources };

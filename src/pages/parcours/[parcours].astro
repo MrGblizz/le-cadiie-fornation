@@ -1,0 +1,187 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import { NIVEAUX, catalogue, formatDuree, formatJours, type Parcours } from '../../lib/formations';
+
+export async function getStaticPaths() {
+  const { parcours } = await catalogue();
+  return parcours.map((p) => ({ params: { parcours: p.id }, props: { parcours: p } }));
+}
+
+interface Props {
+  parcours: Parcours;
+}
+const { parcours } = Astro.props;
+const d = parcours.data;
+const premier = parcours.etapes[0];
+const urlDebut = premier.type === 'formation' ? (premier.formation.cours[0]?.url ?? premier.formation.url) : premier.cours.url;
+---
+
+<Base titre={d.titre} description={d.resume}>
+  <Fragment slot="filtres">
+    <h2>Étapes du parcours</h2>
+    <ol>
+      {
+        parcours.etapes.map((e, i) => (
+          <li>
+            <a href={`#etape-${i + 1}`}>{e.type === 'formation' ? e.formation.data.nom : e.cours.data.nom}</a>
+          </li>
+        ))
+      }
+    </ol>
+  </Fragment>
+
+  <article class="parcours" style={d.couleur ? `--accent: ${d.couleur}` : undefined}>
+    <nav class="fil" aria-label="Fil d'Ariane"><a href="/formations/">Formations</a> › Parcours</nav>
+
+    <header class="entete-page">
+      {d.image && <Image src={d.image} alt="" class="couverture" width={900} />}
+      <p class="surtitre">Parcours</p>
+      <h1>{d.titre}</h1>
+      <p>{d.resume}</p>
+      <p class="total">
+        {parcours.etapes.length} étapes · {parcours.nbCours} cours · 📖 {formatDuree(parcours.temps.lecture)} · ✍️
+        {formatDuree(parcours.temps.pratique)} · 🎯 {formatJours(parcours.temps.maitrise)}
+      </p>
+      <a class="bouton" href={urlDebut}>Commencer le parcours →</a>
+    </header>
+
+    <ol class="etapes">
+      {
+        parcours.etapes.map((e, i) => (
+          <li id={`etape-${i + 1}`}>
+            <span class="numero">{i + 1}</span>
+            <div class="carte">
+              {e.type === 'formation' ? (
+                <>
+                  <p class="type">Formation · {e.formation.cours.length} cours · {NIVEAUX[e.formation.data.niveau]}</p>
+                  <h2>
+                    <a href={e.formation.url}>{e.formation.data.nom}</a>
+                  </h2>
+                  <p>{e.formation.data.resume}</p>
+                  {e.note && <p class="note">💡 {e.note}</p>}
+                  <ol class="sous-cours">
+                    {e.formation.cours.map((c) => (
+                      <li>
+                        <a href={c.url}>{c.data.nom}</a> <small>{formatDuree(c.data.temps.lecture)}</small>
+                      </li>
+                    ))}
+                  </ol>
+                </>
+              ) : (
+                <>
+                  <p class="type">
+                    Cours seul · de la formation <a href={e.cours.formation.url}>{e.cours.formation.data.nom}</a>
+                  </p>
+                  <h2>
+                    <a href={e.cours.url}>{e.cours.data.nom}</a>
+                  </h2>
+                  <p>{e.cours.data.resume}</p>
+                  {e.note && <p class="note">💡 {e.note}</p>}
+                </>
+              )}
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </article>
+</Base>
+
+<style>
+  .fil {
+    font-size: 0.9rem;
+    color: var(--texte-doux);
+    margin-bottom: 1rem;
+  }
+  .couverture {
+    width: 100%;
+    height: auto;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: var(--rayon);
+    margin-bottom: 1rem;
+  }
+  .surtitre {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.8rem !important;
+    font-weight: 700;
+    color: var(--accent) !important;
+  }
+  .total {
+    margin: 0.6rem 0 1rem !important;
+    font-size: 0.92rem;
+  }
+  .etapes {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+  }
+  .etapes > li {
+    display: grid;
+    grid-template-columns: 2.6rem minmax(0, 1fr);
+    gap: 1rem;
+    padding-bottom: 1.25rem;
+    position: relative;
+  }
+  /* trait vertical qui relie les étapes */
+  .etapes > li:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 1.25rem;
+    top: 2.6rem;
+    bottom: 0;
+    width: 3px;
+    background: var(--accent-clair);
+  }
+  .numero {
+    width: 2.6rem;
+    height: 2.6rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+  .carte {
+    background: var(--surface);
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    padding: 0.9rem 1.2rem;
+    overflow-wrap: anywhere;
+  }
+  .carte h2 {
+    margin: 0.1rem 0 0.4rem;
+    font-size: 1.35rem;
+  }
+  .carte h2 a {
+    color: var(--texte);
+  }
+  .carte p {
+    margin: 0.3rem 0;
+  }
+  .type {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--texte-doux);
+  }
+  .note {
+    background: var(--accent-clair);
+    padding: 0.4rem 0.7rem;
+    border-radius: 6px;
+    font-size: 0.92rem;
+  }
+  .sous-cours {
+    margin: 0.5rem 0 0;
+    padding-left: 1.2rem;
+    font-size: 0.92rem;
+  }
+  .sous-cours small {
+    color: var(--texte-doux);
+  }
+</style>

@@ -1,9 +1,8 @@
-# Formation : Prendre la parole en AG
+# Cours : Prendre la parole en AG
 nom: Prendre la parole en AG
 resume: Préparer et réussir une intervention claire et convaincante en assemblée générale.
 image: images/couverture.svg
 niveau: intermediaire
-themes: [Prise de parole, Assemblée générale]
 dependances:
   - les-bases-du-syndicalisme
 temps:
@@ -11,10 +10,6 @@ temps:
   pratique: 90
   maitrise: 21
 modalite: support   # support d'une formation physique
-date_ajout: 2026-05-12
-popularite:
-  suivis: 148
-  note: 4.5
 
 quiz_debut:
   seuil: 60
