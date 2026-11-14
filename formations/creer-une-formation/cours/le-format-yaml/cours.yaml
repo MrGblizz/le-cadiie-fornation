@@ -1,0 +1,136 @@
+# Cours 2 : Le format YAML
+nom: Le format YAML en 20 minutes
+resume: Les quelques règles à connaître pour écrire les fichiers du site sans erreur — indentation, listes, textes longs.
+niveau: debutant
+dependances: []
+temps:
+  lecture: 20
+  pratique: 40
+  maitrise: 5
+modalite: maison
+
+contenu:
+  - titre: Pourquoi le YAML ?
+    texte: |
+      Toutes les formations du site sont écrites dans des fichiers **YAML** (extension `.yaml`). C'est un format
+      texte, lisible par un humain, que le site transforme automatiquement en pages web.
+
+      Tu n'as donc **pas besoin de savoir coder** : il suffit de respecter quelques règles d'écriture.
+      Un simple éditeur de texte suffit (par exemple VSCodium, Kate ou Gedit — pas un traitement de texte
+      comme LibreOffice Writer).
+
+  - titre: "Règle 1 : clé, deux-points, espace, valeur"
+    texte: |
+      Chaque information s'écrit `cle: valeur`, avec **un espace après les deux-points** :
+
+      ```yaml
+      nom: Prendre la parole en AG
+      niveau: intermediaire
+      ```
+
+      Les noms des clés (`nom`, `niveau`…) sont imposés par le site : écris-les exactement comme dans le modèle,
+      sans accent et en minuscules.
+
+  - titre: "Règle 2 : l'indentation compte"
+    texte: |
+      Les **espaces en début de ligne** indiquent ce qui est « à l'intérieur » de quoi. On utilise **2 espaces**,
+      jamais de tabulation :
+
+      ```yaml
+      temps:
+        lecture: 20
+        pratique: 60
+        maitrise: 14
+      ```
+
+      Ici, `lecture`, `pratique` et `maitrise` sont à l'intérieur de `temps`. Un espace en trop ou en moins,
+      et le fichier ne veut plus rien dire.
+
+  - titre: "Règle 3 : les listes"
+    texte: |
+      Une liste s'écrit avec un tiret et un espace en début de ligne :
+
+      ```yaml
+      dependances:
+        - les-bases-du-syndicalisme
+        - prendre-la-parole-en-ag
+      ```
+
+      Pour une liste courte, on peut aussi l'écrire sur une ligne, entre crochets :
+
+      ```yaml
+      themes: [Syndicalisme, Droits]
+      ```
+
+      Une liste vide s'écrit `[]`.
+
+  - titre: "Règle 4 : les textes longs"
+    texte: |
+      Pour un texte sur plusieurs lignes, on écrit `|` puis on va à la ligne et on **décale tout le texte** :
+
+      ```yaml
+      texte: |
+        Premier paragraphe.
+
+        Deuxième paragraphe, avec du **gras**.
+      ```
+
+      Tout ce qui est décalé fait partie du texte, lignes vides comprises.
+
+  - titre: Le piège des deux-points
+    texte: |
+      Si une valeur sur une seule ligne contient elle-même « deux-points + espace », le YAML croit à une nouvelle
+      clé et plante. Dans ce cas, mets la valeur **entre guillemets** :
+
+      ```yaml
+      titre: "Exercice : ton plan"
+      ```
+
+      Même chose si la valeur commence par un caractère spécial (`[`, `{`, `*`, `#`, `&`…).
+      Tout ce qui suit un `#` précédé d'un espace est un **commentaire** : il est ignoré par le site.
+    html: htmls/aide-memoire.html
+
+  - titre: "Exercice : repérer les erreurs"
+    texte: |
+      Ce fichier contient **trois erreurs**. Trouve-les avant de regarder la solution.
+
+      ```yaml
+      nom:Organiser une AG
+      temps:
+        lecture: 20
+         pratique: 45
+      titre: Étape 1 : réserver la salle
+      ```
+
+      **Solution :** il manque l'espace après `nom:` ; `pratique` a un espace de trop ;
+      le titre contient « deux-points + espace » et doit être mis entre guillemets.
+
+quiz_fin:
+  seuil: 75
+  questions:
+    - question: Combien d'espaces utilise-t-on pour décaler une ligne ?
+      choix:
+        - Une tabulation
+        - 2 espaces
+        - Autant qu'on veut, du moment que c'est joli
+      reponse: 1
+    - question: Quelle ligne est correcte ?
+      choix:
+        - "nom:Mon cours"
+        - "nom: Mon cours"
+        - "nom = Mon cours"
+      reponse: 1
+      explication: Il faut un espace après les deux-points.
+    - question: Comment écrire un texte sur plusieurs paragraphes ?
+      choix:
+        - Avec « | » puis le texte décalé sur les lignes suivantes
+        - Tout sur une seule ligne
+        - Entre crochets
+      reponse: 0
+    - question: Que faire si une valeur contient « deux-points + espace » ?
+      choix:
+        - La mettre entre guillemets
+        - Supprimer les deux-points
+        - Ajouter un # devant
+      reponse: 0
+      explication: Le # transformerait la ligne en commentaire, ignoré par le site.

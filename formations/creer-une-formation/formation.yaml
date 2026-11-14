@@ -1,0 +1,14 @@
+# Formation : Créer une formation pour Le Cadiie
+nom: Créer une formation pour Le Cadiie
+resume: Concevoir, rédiger et publier tes propres formations sur ce site — de l'idée pédagogique au fichier YAML en ligne.
+image: images/couverture.svg
+niveau: intermediaire
+themes: [Contribuer, Pédagogie]
+dependances: []
+cours:
+  - concevoir-une-formation
+  - le-format-yaml
+  - ecrire-un-cours
+  - rediger-les-quiz
+  - publier-sa-formation
+date_ajout: 2026-11-14

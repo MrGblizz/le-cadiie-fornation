@@ -346,6 +346,34 @@ h3 {
 .prose img {
   border-radius: var(--rayon);
 }
+.prose pre {
+  background: #272822;
+  color: #f8f8f2;
+  padding: 0.8rem 1rem;
+  border-radius: var(--rayon);
+  overflow-x: auto;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+.prose :not(pre) > code {
+  background: var(--accent-clair);
+  padding: 0.05rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+.prose table {
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+.prose th,
+.prose td {
+  border: 1px solid var(--bordure);
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+}
+.prose th {
+  background: var(--accent-clair);
+}
 .prose blockquote {
   margin: 1rem 0;
   padding: 0.5rem 1rem;

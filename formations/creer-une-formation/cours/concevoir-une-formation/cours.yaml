@@ -1,0 +1,108 @@
+# Cours 1 : Concevoir une formation
+nom: Concevoir une formation
+resume: Avant d'écrire la moindre ligne — définir à qui on s'adresse, ce qu'on veut transmettre et comment découper le tout en cours.
+niveau: debutant
+dependances: []
+temps:
+  lecture: 15
+  pratique: 45
+  maitrise: 7
+modalite: maison
+
+contenu:
+  - titre: Formation, cours, parcours
+    texte: |
+      Sur Le Cadiie Formation, le contenu est rangé sur **trois niveaux** :
+
+      - un **cours** est une unité courte (15 à 45 minutes de lecture) sur une seule idée, avec un quiz ;
+      - une **formation** regroupe plusieurs cours sur un même sujet, dans un ordre logique ;
+      - un **parcours** enchaîne des formations entières ou des cours seuls pour accompagner une progression
+        (par exemple « La base du militantisme »).
+
+      Tu vas donc presque toujours écrire **une formation de plusieurs cours**, pas un seul long texte.
+
+  - titre: Partir d'un objectif, pas d'un sujet
+    texte: |
+      « La prise de parole » est un *sujet*. « Être capable de faire une intervention de 2 minutes en AG » est un
+      **objectif**. Une bonne formation part toujours d'un objectif concret, formulé avec un verbe d'action :
+
+      - *comprendre* le rôle d'un syndicat ;
+      - *préparer* une intervention ;
+      - *réaliser* une affiche ;
+      - *organiser* une action.
+
+      Pose-toi trois questions :
+
+      1. **Pour qui ?** Débutant·es complet·es, ou personnes qui ont déjà milité ?
+      2. **Pour quoi faire ?** Que saura faire la personne à la fin, qu'elle ne savait pas faire avant ?
+      3. **Comment le vérifier ?** C'est ce qui donnera ton quiz de fin.
+
+  - titre: Découper en cours
+    texte: |
+      Un cours = **une idée** que l'on peut lire d'une traite. Si un cours dépasse 45 minutes de lecture,
+      c'est souvent qu'il en contient deux.
+
+      Une méthode simple :
+
+      1. liste tout ce que la personne doit savoir ou savoir faire ;
+      2. regroupe ces éléments par paquets cohérents (3 à 6 paquets en général) ;
+      3. range les paquets du plus simple au plus difficile : ce sont tes cours, dans l'ordre.
+
+      Termine chaque cours par un **exercice pratique** : on apprend en faisant.
+
+  - titre: Les informations à préparer
+    texte: |
+      Pour chaque cours, le site te demandera :
+
+      | Information | Exemple |
+      |---|---|
+      | **Niveau** | débutant, intermédiaire ou avancé |
+      | **Prérequis** | les cours à avoir faits avant |
+      | **Temps de lecture** | 20 minutes pour simplement le lire |
+      | **Temps de pratique** | 60 minutes pour le faire en lisant, exercices compris |
+      | **Jours de maîtrise** | 14 jours de pratique pour être vraiment à l'aise |
+      | **Modalité** | à la maison, support d'une formation physique, ou accompagné sur le terrain |
+
+      La **modalité** est importante : tout ce qui touche à la sécurité, au droit ou aux actions de rue doit être
+      marqué **terrain**. Un texte en ligne ne remplace pas l'accompagnement par des camarades expérimenté·es.
+
+  - titre: "Exercice : ton plan"
+    texte: |
+      Sur une feuille, écris :
+
+      - le **nom** de ta formation et une phrase de **résumé** ;
+      - l'**objectif** (« à la fin, la personne saura… ») ;
+      - la **liste de tes cours**, dans l'ordre, avec pour chacun une phrase de résumé ;
+      - pour chaque cours, sa **modalité** et ses **prérequis**.
+
+      Garde ce plan : tu vas le transformer en fichiers dans les cours suivants.
+
+quiz_fin:
+  seuil: 70
+  questions:
+    - question: Que regroupe une formation ?
+      choix:
+        - Plusieurs cours sur un même sujet
+        - Plusieurs parcours
+        - Un seul long texte
+      reponse: 0
+    - question: Lequel de ces intitulés est un objectif (et pas seulement un sujet) ?
+      choix:
+        - La prise de parole
+        - Être capable de faire une intervention de 2 minutes en AG
+        - Les assemblées générales
+      reponse: 1
+      explication: Un objectif décrit ce que la personne saura faire, avec un verbe d'action.
+    - question: Un cours sur les droits face aux forces de l'ordre doit être marqué…
+      choix:
+        - « maison »
+        - « support »
+        - « terrain »
+      reponse: 2
+      explication: Les sujets de sécurité et de droit doivent être accompagnés sur le terrain.
+    - question: Quels signes montrent qu'un cours est trop long ?
+      choix:
+        - Il dépasse 45 minutes de lecture
+        - Il traite de plusieurs idées différentes
+        - Il se termine par un exercice
+      reponse: [0, 1]

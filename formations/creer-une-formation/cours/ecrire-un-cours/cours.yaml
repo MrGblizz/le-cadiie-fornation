@@ -1,0 +1,181 @@
+# Cours 3 : Écrire un cours
+nom: Écrire une formation et ses cours
+resume: Créer les dossiers, remplir formation.yaml et cours.yaml, et enrichir le contenu avec du Markdown, des images, des vidéos et des sons.
+dependances:
+  - concevoir-une-formation
+  - le-format-yaml
+temps:
+  lecture: 30
+  pratique: 90
+  maitrise: 14
+modalite: maison
+
+quiz_debut:
+  seuil: 70
+  questions:
+    - question: Que regroupe une formation sur ce site ?
+      choix:
+        - Plusieurs cours sur un même sujet
+        - Plusieurs parcours
+      reponse: 0
+      dependance: concevoir-une-formation
+    - question: Quelle ligne YAML est correcte ?
+      choix:
+        - "  lecture:20"
+        - "lecture: 20"
+      reponse: 1
+      dependance: le-format-yaml
+    - question: Comment décale-t-on une ligne en YAML ?
+      choix:
+        - Avec 2 espaces
+        - Avec une tabulation
+      reponse: 0
+      dependance: le-format-yaml
+
+contenu:
+  - titre: Le rangement des dossiers
+    texte: |
+      Tout se trouve dans le dossier `formations/` du projet. **Une formation = un dossier**, et dedans,
+      **un cours = un sous-dossier** de `cours/` :
+
+      ```
+      formations/
+        ma-formation/
+          formation.yaml        ← la fiche de la formation
+          images/               ← son image de présentation
+          styles/               ← (facultatif) CSS de toute la formation
+          cours/
+            mon-premier-cours/
+              cours.yaml        ← le contenu du cours
+              images/  sons/  htmls/  styles/
+      ```
+
+      Le **nom des dossiers** devient l'adresse de la page : `/formations/ma-formation/mon-premier-cours/`.
+      Utilise uniquement des minuscules, des chiffres et des tirets (pas d'espace ni d'accent).
+
+      Le plus simple : **copie le modèle** `docs/modele-formation/` et renomme-le.
+
+  - titre: La fiche de la formation (formation.yaml)
+    texte: |
+      ```yaml
+      nom: Communication militante
+      resume: Faire passer un message clairement.
+      image: images/couverture.png
+      niveau: debutant
+      themes: [Communication, Graphisme]
+      dependances: []
+      cours:
+        - creer-une-affiche
+        - faire-un-tract
+      date_ajout: 2026-11-14
+      ```
+
+      - `cours` donne **l'ordre** des cours (les noms de leurs dossiers) ;
+      - `dependances` liste les **formations** à suivre avant ;
+      - `date_ajout` fait apparaître la formation dans « Nouvelles formations » pendant 45 jours ;
+      - le temps total et la modalité sont **calculés automatiquement** à partir des cours.
+
+  - titre: La fiche du cours (cours.yaml)
+    texte: |
+      ```yaml
+      nom: Créer une affiche militante
+      resume: Concevoir une affiche lisible et percutante.
+      dependances: []
+      temps:
+        lecture: 15     # minutes pour le lire
+        pratique: 60    # minutes pour le faire en le lisant
+        maitrise: 10    # jours de pratique
+      modalite: maison  # maison | support | terrain
+      contenu:
+        - titre: Une affiche se lit en 3 secondes
+          texte: |
+            Le texte de la section…
+      ```
+
+      `niveau` est facultatif dans un cours : s'il est absent, le cours prend le niveau de sa formation.
+
+      Pour un prérequis, écris le nom du cours s'il est **dans la même formation**
+      (`creer-une-affiche`), sinon `formation/cours` (`syndicalisme/les-bases-du-syndicalisme`).
+
+  - titre: Le contenu, section par section
+    texte: |
+      `contenu` est une **liste de sections**. Chacune a un `titre` et peut contenir :
+
+      | Champ | Ce qu'il affiche |
+      |---|---|
+      | `texte` | du texte en Markdown |
+      | `image` + `legende` | une image du dossier `images/` |
+      | `video` | un lien YouTube / PeerTube, ou un fichier `videos/xxx.mp4` |
+      | `son` | un fichier du dossier `sons/` |
+      | `html` | un fichier du dossier `htmls/`, inséré tel quel dans la page |
+
+      Les sections s'affichent dans l'ordre, et le sommaire de la barre latérale est créé automatiquement.
+
+  - titre: Mettre en forme avec le Markdown
+    texte: |
+      Dans `texte`, tu écris en **Markdown**, une façon simple de mettre en forme :
+
+      | J'écris | J'obtiens |
+      |---|---|
+      | `**important**` | **important** |
+      | `*nuance*` | *nuance* |
+      | `- élément` | une liste à puces |
+      | `1. étape` | une liste numérotée |
+      | `> citation` | un encadré de citation |
+      | `[texte](https://…)` | un lien |
+
+      Laisse une **ligne vide** entre deux paragraphes.
+
+  - titre: Aller plus loin — htmls et styles
+    texte: |
+      Le Markdown suffit dans 9 cas sur 10. Les dossiers suivants sont **facultatifs** :
+
+      - `htmls/` : pour un élément que le Markdown ne sait pas faire (tableau à remplir, exercice interactif…).
+        On l'appelle avec `html: htmls/mon-fichier.html`. L'aide-mémoire du cours précédent en est un exemple.
+      - `styles/` : un fichier CSS qui **change l'apparence** du site sur ce cours (couleur principale…).
+        Placé dans le dossier de la formation, il s'applique à tous ses cours.
+
+      ```css
+      :root {
+        --accent: #6a1b9a;
+      }
+      ```
+
+  - titre: "Exercice : ton premier cours"
+    texte: |
+      Reprends le plan de ton premier cours, puis :
+
+      1. copie `docs/modele-formation/` dans `formations/` et renomme-le ;
+      2. remplis `formation.yaml` ;
+      3. renomme `cours/modele-de-cours/` avec le nom de ton premier cours et remplis `cours.yaml`
+         avec au moins deux sections.
+
+      Ne t'occupe pas encore des quiz : c'est l'objet du cours suivant.
+
+quiz_fin:
+  seuil: 70
+  questions:
+    - question: Où se trouve le fichier d'un cours ?
+      choix:
+        - formations/ma-formation/cours/mon-cours/cours.yaml
+        - formations/mon-cours.yaml
+        - contenu/cours/mon-cours.yaml
+      reponse: 0
+    - question: Quel nom de dossier est correct ?
+      choix:
+        - Mon Cours
+        - mon-cours
+        - mon_cours_é
+      reponse: 1
+      explication: Minuscules, chiffres et tirets uniquement, car le nom devient l'adresse de la page.
+    - question: Comment indiquer qu'un cours dépend d'un cours d'une AUTRE formation ?
+      choix:
+        - En écrivant seulement le nom du cours
+        - En écrivant formation/cours
+      reponse: 1
+    - question: Que peut contenir une section de contenu ?
+      choix:
+        - Du texte en Markdown
+        - Une image ou une vidéo
+        - Un fichier HTML du dossier htmls/
+      reponse: [0, 1, 2]

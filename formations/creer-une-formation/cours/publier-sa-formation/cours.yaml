@@ -1,0 +1,132 @@
+# Cours 5 : Publier sa formation
+nom: Tester et publier sa formation
+resume: Vérifier sa formation sur son ordinateur, comprendre les messages d'erreur, puis la mettre en ligne et l'ajouter à un parcours.
+dependances:
+  - ecrire-un-cours
+  - rediger-les-quiz
+temps:
+  lecture: 20
+  pratique: 60
+  maitrise: 7
+modalite: support   # plus simple la première fois avec quelqu'un qui a déjà publié
+
+quiz_debut:
+  seuil: 60
+  questions:
+    - question: Que fait la personne qui réussit le quiz de fin d'un cours ?
+      choix:
+        - Le cours est coché « validé » dans le programme
+        - Elle reçoit un e-mail
+      reponse: 0
+      dependance: rediger-les-quiz
+    - question: Le nom du dossier d'un cours devient…
+      choix:
+        - l'adresse de sa page
+        - son titre affiché
+      reponse: 0
+      dependance: ecrire-un-cours
+
+contenu:
+  - titre: Voir sa formation en direct
+    texte: |
+      Le projet doit être installé sur ton ordinateur (avec Node.js). Dans un terminal, depuis le dossier
+      du projet, lance :
+
+      ```bash
+      npm run dev
+      ```
+
+      puis ouvre **http://localhost:4321** dans ton navigateur. À chaque enregistrement d'un fichier, la page se
+      met à jour toute seule : garde-la ouverte pendant que tu écris.
+
+  - titre: Comprendre les messages d'erreur
+    texte: |
+      Le site **vérifie tes fichiers** et s'arrête avec un message s'il y a un problème. Pas de panique : le
+      message dit presque toujours où chercher.
+
+      | Message | Cause probable |
+      |---|---|
+      | `nom: Required` | un champ obligatoire est manquant ou mal orthographié |
+      | `YAMLException` + numéro de ligne | une erreur de YAML (indentation, deux-points…) |
+      | `cours inconnu « … »` | une faute dans le nom d'un prérequis ou d'un cours de `cours:` |
+      | `fichier introuvable` | une image, un son ou un fichier HTML mal nommé |
+      | `Could not find requested image` | le chemin de l'image est faux |
+
+      Corrige, enregistre : la page se recharge.
+
+  - titre: La relecture avant publication
+    texte: |
+      Avant de publier, vérifie :
+
+      - [ ] chaque cours s'affiche, sans faute de frappe ;
+      - [ ] les **temps** et la **modalité** sont réalistes ;
+      - [ ] les **quiz** fonctionnent (fais-les toi-même, en te trompant exprès une fois) ;
+      - [ ] les liens « cours suivant » s'enchaînent dans le bon ordre ;
+      - [ ] une **autre personne** a relu au moins un cours.
+
+  - titre: Enregistrer avec git
+    texte: |
+      Le projet est suivi avec **git**, qui garde l'historique de toutes les modifications.
+      Pour enregistrer ta formation :
+
+      ```bash
+      git add formations/ma-formation
+      git commit -m "Ajout de la formation Ma formation"
+      ```
+
+  - titre: Mettre en ligne
+    texte: |
+      Le site en ligne est une version **construite** du projet. Pour la mettre à jour :
+
+      ```bash
+      npm run build
+      rsync -avz --delete dist/ identifiant@serveur:~/html/
+      ```
+
+      La première commande fabrique le site dans le dossier `dist/`, la seconde l'envoie sur le serveur.
+      Si `npm run build` affiche une erreur, rien n'est envoyé : corrige-la d'abord.
+
+  - titre: Ajouter sa formation à un parcours
+    texte: |
+      Les parcours sont dans `contenu/parcours/`. Pour y ajouter ta formation, ajoute une **étape** :
+
+      ```yaml
+      etapes:
+        - formation: syndicalisme
+        - formation: ma-formation
+          note: Un commentaire facultatif sur cette étape.
+        - cours: communication/creer-une-affiche   # un cours seul
+      ```
+
+      Tu peux aussi créer ton propre parcours en copiant un fichier existant.
+
+  - titre: "Exercice final"
+    texte: |
+      Termine ta formation, fais-la relire, puis publie-la. Félicitations : tu fais désormais partie des
+      personnes qui forment les autres. ✊
+
+quiz_fin:
+  seuil: 70
+  questions:
+    - question: Quelle commande affiche le site sur ton ordinateur pendant que tu écris ?
+      choix:
+        - npm run dev
+        - npm run build
+        - git commit
+      reponse: 0
+    - question: Le site affiche « cours inconnu ». Que vérifier ?
+      choix:
+        - L'orthographe des prérequis et de la liste « cours »
+        - La couleur du site
+      reponse: 0
+    - question: Que fait « npm run build » ?
+      choix:
+        - Il fabrique le site dans le dossier dist/
+        - Il envoie le site sur le serveur
+      reponse: 0
+      explication: L'envoi se fait ensuite avec rsync.
+    - question: Comment ajouter un cours seul à un parcours ?
+      choix:
+        - "- cours: formation/nom-du-cours"
+        - "- formation: nom-du-cours"
+      reponse: 0

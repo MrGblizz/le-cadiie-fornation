@@ -1,0 +1,134 @@
+# Cours 4 : Rédiger les quiz
+nom: Rédiger les quiz de début et de fin
+resume: Vérifier les prérequis avant le cours et les acquis après — écrire des questions utiles et bien les configurer.
+dependances:
+  - ecrire-un-cours
+temps:
+  lecture: 20
+  pratique: 45
+  maitrise: 7
+modalite: maison
+
+quiz_debut:
+  seuil: 60
+  questions:
+    - question: Dans quel fichier écrit-on le contenu d'un cours ?
+      choix:
+        - cours.yaml
+        - formation.yaml
+        - index.html
+      reponse: 0
+      dependance: ecrire-un-cours
+    - question: Comment désigner un cours d'une autre formation ?
+      choix:
+        - formation/cours
+        - cours seulement
+      reponse: 0
+      dependance: ecrire-un-cours
+
+contenu:
+  - titre: Deux quiz, deux rôles
+    texte: |
+      Chaque cours peut avoir deux quiz, tous les deux **facultatifs** :
+
+      - le **quiz de début** (`quiz_debut`) vérifie que la personne a les **prérequis**. En cas d'échec,
+        le site l'invite à réviser les cours concernés, avec des liens ;
+      - le **quiz de fin** (`quiz_fin`) vérifie ce qui a été **retenu**. En cas de réussite, le cours est
+        coché « validé » dans le programme de la formation.
+
+      Un cours sans prérequis n'a pas besoin de quiz de début.
+
+  - titre: Écrire une question
+    texte: |
+      ```yaml
+      quiz_fin:
+        seuil: 70
+        questions:
+          - question: Combien de temps dure une intervention en AG ?
+            choix:
+              - 2 à 3 minutes
+              - 15 minutes
+            reponse: 0
+            explication: Le temps de parole est limité pour que tout le monde parle.
+      ```
+
+      - `seuil` : le **pourcentage** de bonnes réponses pour réussir ;
+      - `choix` : la liste des réponses proposées (au moins deux) ;
+      - `reponse` : le **numéro** de la bonne réponse, **en commençant à 0** (0 = la première, 1 = la deuxième…) ;
+      - `explication` : facultative, affichée après la validation.
+
+      ⚠️ Si ta question ou une réponse contient « deux-points + espace », mets-la entre guillemets.
+
+  - titre: Plusieurs bonnes réponses
+    texte: |
+      Pour une question à plusieurs bonnes réponses, donne une **liste** de numéros. Le site affiche alors des
+      cases à cocher au lieu de boutons ronds :
+
+      ```yaml
+      reponse: [0, 2]
+      ```
+
+      La personne doit cocher **exactement** toutes les bonnes réponses, et aucune mauvaise.
+
+  - titre: Relier une question à un prérequis
+    texte: |
+      Dans le quiz de début, chaque question peut dire **quel cours elle évalue** avec `dependance` :
+
+      ```yaml
+      quiz_debut:
+        seuil: 70
+        questions:
+          - question: Qu'est-ce qu'une assemblée générale ?
+            choix:
+              - Une réunion où les membres débattent et votent
+              - Un document officiel
+            reponse: 0
+            dependance: syndicalisme/les-bases-du-syndicalisme
+      ```
+
+      Si la personne se trompe, le message d'échec proposera **précisément ce cours** à réviser,
+      au lieu de tous les prérequis.
+
+  - titre: De bonnes questions
+    texte: |
+      - Une question = **une idée** du cours.
+      - Des mauvaises réponses **crédibles** : une réponse absurde ne vérifie rien.
+      - Préfère les **situations concrètes** (« En AG, tu as 2 minutes : que fais-tu d'abord ? ») aux définitions
+        apprises par cœur.
+      - Ajoute une **explication** aux questions difficiles : le quiz devient lui aussi un moment d'apprentissage.
+      - 3 à 6 questions suffisent largement.
+
+  - titre: "Exercice : tes quiz"
+    texte: |
+      Ajoute à ton premier cours un **quiz de fin** de 3 à 5 questions, dont au moins une à plusieurs réponses.
+      S'il a des prérequis, ajoute aussi un **quiz de début** relié aux cours concernés.
+
+quiz_fin:
+  seuil: 75
+  questions:
+    - question: Que vérifie le quiz de début ?
+      choix:
+        - Les prérequis
+        - Ce qui a été retenu du cours
+      reponse: 0
+    - question: Avec « choix » égal à [Rouge, Vert, Bleu], quelle valeur de « reponse » désigne Vert ?
+      choix: ["0", "1", "2"]
+      reponse: 1
+      explication: La numérotation commence à 0 — Rouge = 0, Vert = 1, Bleu = 2.
+    - question: Comment indiquer deux bonnes réponses, la première et la troisième ?
+      choix:
+        - "reponse: [0, 2]"
+        - "reponse: 1 et 3"
+        - "reponse: [1, 3]"
+      reponse: 0
+    - question: À quoi sert le champ « dependance » d'une question ?
+      choix:
+        - À proposer le bon cours à réviser en cas d'erreur
+        - À rendre la question obligatoire
+      reponse: 0
+    - question: Quelles sont de bonnes pratiques ?
+      choix:
+        - Des mauvaises réponses crédibles
+        - Des situations concrètes
+        - Vingt questions par quiz
+      reponse: [0, 1]

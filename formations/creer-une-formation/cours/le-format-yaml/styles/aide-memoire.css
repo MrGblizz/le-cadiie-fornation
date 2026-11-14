@@ -1,0 +1,24 @@
+/* Style de l'aide-mémoire (htmls/aide-memoire.html), propre à ce cours. */
+.aide-memoire {
+  width: 100%;
+  margin: 1rem 0;
+  border-collapse: collapse;
+  background: var(--surface);
+}
+.aide-memoire caption {
+  text-align: left;
+  font-weight: 700;
+  padding-bottom: 0.4rem;
+}
+.aide-memoire th,
+.aide-memoire td {
+  border: 1px solid var(--bordure);
+  padding: 0.45rem 0.6rem;
+  text-align: left;
+}
+.aide-memoire th {
+  background: var(--accent-clair);
+}
+.aide-memoire code {
+  white-space: nowrap;
+}
