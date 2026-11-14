@@ -1,0 +1,71 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import { formatDate } from '../../lib/formations';
+
+export async function getStaticPaths() {
+  const numeros = await getCollection('journal');
+  return numeros.map((n) => ({ params: { slug: n.id }, props: { numero: n } }));
+}
+
+interface Props {
+  numero: CollectionEntry<'journal'>;
+}
+const { numero } = Astro.props;
+const { Content, headings } = await render(numero);
+const d = numero.data;
+---
+
+<Base titre={d.titre} description={d.resume}>
+  {
+    headings.length > 0 && (
+      <Fragment slot="filtres">
+        <h2>Dans ce numéro</h2>
+        <ul>
+          {headings
+            .filter((h) => h.depth === 2)
+            .map((h) => (
+              <li>
+                <a href={`#${h.slug}`}>{h.text}</a>
+              </li>
+            ))}
+        </ul>
+      </Fragment>
+    )
+  }
+
+  <article class="numero" style={d.couleur ? `--accent: ${d.couleur}` : undefined}>
+    <p><a href="/journal/">← Tous les numéros</a></p>
+    <header class="entete-page">
+      <p class="surtitre">Le Cadiie — Journal · N°{d.numero} · {formatDate(d.date)}</p>
+      <h1>{d.titre}</h1>
+      <p>{d.resume}</p>
+      {d.auteur && <p class="auteur">Par {d.auteur}</p>}
+    </header>
+    {d.couverture && <Image src={d.couverture} alt="" class="couv" />}
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+</Base>
+
+<style>
+  .surtitre {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.8rem;
+    color: var(--accent) !important;
+    font-weight: 700;
+    margin-bottom: 0.4rem !important;
+  }
+  .auteur {
+    margin-top: 0.6rem !important;
+    font-style: italic;
+  }
+  .couv {
+    border-radius: var(--rayon);
+    margin-bottom: 1.5rem;
+    height: auto;
+  }
+</style>

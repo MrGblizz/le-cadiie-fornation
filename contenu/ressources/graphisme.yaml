@@ -1,0 +1,26 @@
+titre: Graphisme
+type: Logiciels
+description: Logiciels pour créer affiches, tracts, logos et visuels pour les réseaux.
+icone: "🎨"
+ordre: 1
+liens:
+  - nom: Inkscape
+    url: https://inkscape.org/fr/
+    description: Dessin vectoriel — idéal pour affiches, logos et tracts.
+    libre: true
+    plateformes: [Windows, macOS, Linux]
+  - nom: Krita
+    url: https://krita.org/fr/
+    description: Peinture numérique et retouche, très complet.
+    libre: true
+    plateformes: [Windows, macOS, Linux]
+  - nom: GIMP
+    url: https://www.gimp.org/
+    description: Retouche photo.
+    libre: true
+    plateformes: [Windows, macOS, Linux]
+  - nom: Scribus
+    url: https://www.scribus.net/
+    description: Mise en page (journaux, brochures, livrets).
+    libre: true
+    plateformes: [Windows, macOS, Linux]

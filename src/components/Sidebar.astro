@@ -1,0 +1,102 @@
+---
+interface Props {
+  avecFiltres?: boolean;
+}
+const { avecFiltres = false } = Astro.props;
+const chemin = Astro.url.pathname;
+
+const pages = [
+  { href: '/', label: 'Accueil', icone: '⌂' },
+  { href: '/journal/', label: 'Journal', icone: '✎' },
+  { href: '/formations/', label: 'Formations', icone: '★' },
+  { href: '/ressources/', label: 'Ressources', icone: '⚒' },
+];
+const estActif = (href: string) => (href === '/' ? chemin === '/' : chemin.startsWith(href));
+---
+
+<aside class="barre">
+  <a href="/" class="marque">
+    Le Cadiie
+    <span>Formation</span>
+  </a>
+
+  <div class="recherche" data-recherche>
+    <label for="champ-recherche" class="sr-only">Rechercher sur le site</label>
+    <input id="champ-recherche" type="search" placeholder="Rechercher…" autocomplete="off" />
+    <ul class="resultats" hidden></ul>
+  </div>
+
+  <nav aria-label="Navigation principale">
+    <ul>
+      {
+        pages.map((p) => (
+          <li>
+            <a href={p.href} aria-current={estActif(p.href) ? 'page' : undefined}>
+              <span class="icone" aria-hidden="true">{p.icone}</span>
+              {p.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+
+  {
+    avecFiltres && (
+      <div class="filtres">
+        <slot name="filtres" />
+      </div>
+    )
+  }
+
+  <footer class="pied">Le Cadiie Formation — s'organiser, apprendre, agir.</footer>
+</aside>
+
+<script>
+  const boite = document.querySelector<HTMLElement>('[data-recherche]')!;
+  const champ = boite.querySelector('input')!;
+  const liste = boite.querySelector<HTMLUListElement>('.resultats')!;
+
+  type Entree = { titre: string; type: string; url: string; texte: string; _t?: string };
+  let index: Entree[] | null = null;
+
+  const normaliser = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const echapper = (s: string) =>
+    s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+
+  async function charger() {
+    if (!index) {
+      const rep = await fetch('/recherche.json');
+      index = ((await rep.json()) as Entree[]).map((e) => ({ ...e, _t: normaliser(`${e.titre} ${e.texte}`) }));
+    }
+    return index;
+  }
+
+  function fermer() {
+    liste.hidden = true;
+    liste.innerHTML = '';
+  }
+
+  champ.addEventListener('focus', () => void charger(), { once: true });
+  champ.addEventListener('input', async () => {
+    const q = normaliser(champ.value.trim());
+    if (q.length < 2) return fermer();
+    const mots = q.split(/\s+/);
+    const res = (await charger()).filter((e) => mots.every((m) => e._t!.includes(m))).slice(0, 8);
+    liste.innerHTML = res.length
+      ? res
+          .map((r) => `<li><a href="${r.url}"><span class="type">${echapper(r.type)}</span>${echapper(r.titre)}</a></li>`)
+          .join('')
+      : '<li class="vide">Aucun résultat</li>';
+    liste.hidden = false;
+  });
+  champ.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      champ.value = '';
+      fermer();
+    }
+  });
+  document.addEventListener('click', (e) => {
+    if (!boite.contains(e.target as Node)) fermer();
+  });
+</script>

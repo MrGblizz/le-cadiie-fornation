@@ -1,0 +1,56 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Couverture from '../../components/Couverture.astro';
+import { slugifier } from '../../lib/formations';
+
+const categories = (await getCollection('ressources')).sort(
+  (a, b) => a.data.ordre - b.data.ordre || a.data.titre.localeCompare(b.data.titre, 'fr'),
+);
+const types = [...new Set(categories.map((c) => c.data.type))].sort((a, b) => a.localeCompare(b, 'fr'));
+---
+
+<Base titre="Ressources">
+  <Fragment slot="filtres">
+    <h2>Filtrer les ressources</h2>
+    <fieldset>
+      <legend>Type</legend>
+      {
+        types.map((t) => (
+          <label>
+            <input type="checkbox" data-filtre="type" value={slugifier(t)} /> {t}
+          </label>
+        ))
+      }
+    </fieldset>
+    <fieldset>
+      <legend>Licence</legend>
+      <label><input type="checkbox" data-filtre="libre" value="oui" /> Contient des logiciels libres</label>
+    </fieldset>
+    <p data-compteur></p>
+    <button type="button" class="bouton secondaire" data-reinitialiser>Réinitialiser</button>
+  </Fragment>
+
+  <header class="entete-page">
+    <h1>Ressources</h1>
+    <p>Les outils et liens utiles, rangés par type : graphisme, vidéo, stockage, communication…</p>
+  </header>
+
+  <div class="grille-2">
+    {
+      categories.map((c) => (
+        <Couverture
+          href={`/ressources/${c.id}/`}
+          bandeau="Ressources"
+          surtitre={`${c.data.type} · ${c.data.liens.length} lien${c.data.liens.length > 1 ? 's' : ''}`}
+          titre={c.data.titre}
+          texte={c.data.description}
+          etiquettes={c.data.liens.slice(0, 5).map((l) => l.nom)}
+          icone={c.data.icone}
+          filtres={{ type: slugifier(c.data.type), libre: c.data.liens.some((l) => l.libre) ? 'oui' : 'non' }}
+        />
+      ))
+    }
+  </div>
+  <p data-aucun-resultat hidden>Aucune catégorie ne correspond à ces filtres.</p>
+</Base>

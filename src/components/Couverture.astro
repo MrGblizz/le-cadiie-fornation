@@ -1,0 +1,145 @@
+---
+/**
+ * Carte au format « première de couverture ».
+ * Utilisée pour le journal et pour les catégories de ressources.
+ */
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+
+interface Props {
+  href: string;
+  bandeau: string; // ex. « Le Cadiie — Journal »
+  surtitre?: string; // ex. « N°3 · 14 novembre 2026 »
+  titre: string;
+  texte?: string;
+  etiquettes?: string[];
+  image?: ImageMetadata;
+  icone?: string;
+  couleur?: string;
+  ordre?: number; // position dans le sens de lecture
+  /** Attributs data-* pour les filtres. */
+  filtres?: Record<string, string>;
+}
+
+const { href, bandeau, surtitre, titre, texte, etiquettes = [], image, icone, couleur, ordre, filtres = {} } = Astro.props;
+const dataFiltres = Object.fromEntries(Object.entries(filtres).map(([k, v]) => [`data-${k}`, v]));
+---
+
+<a class="couverture" href={href} style={couleur ? `--couleur-couv: ${couleur}` : undefined} data-filtrable="oui" {...dataFiltres}>
+  <header class="bandeau">
+    <span>{bandeau}</span>
+    {ordre !== undefined && <span class="ordre" title="Ordre de lecture">{ordre}</span>}
+  </header>
+  {surtitre && <p class="surtitre">{surtitre}</p>}
+  <div class="illustration">
+    {image ? <Image src={image} alt="" width={500} /> : <span aria-hidden="true">{icone ?? titre.charAt(0)}</span>}
+  </div>
+  <h3>{titre}</h3>
+  {texte && <p class="texte">{texte}</p>}
+  {
+    etiquettes.length > 0 && (
+      <ul class="etiquettes">
+        {etiquettes.map((e) => (
+          <li>{e}</li>
+        ))}
+      </ul>
+    )
+  }
+</a>
+
+<style>
+  .couverture {
+    --couleur-couv: var(--accent);
+    display: flex;
+    flex-direction: column;
+    aspect-ratio: 3 / 4;
+    padding: 1rem 1.1rem 1.2rem;
+    background: var(--surface);
+    border: 1px solid var(--bordure);
+    border-top: 10px solid var(--couleur-couv);
+    border-radius: 4px;
+    color: var(--texte);
+    text-decoration: none;
+    box-shadow: 4px 4px 0 var(--bordure);
+    transition: transform 0.15s;
+    overflow: hidden;
+  }
+  .couverture:hover {
+    transform: rotate(-0.6deg) translateY(-3px);
+  }
+  .bandeau {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--police-titre);
+    font-weight: 700;
+    font-size: 1.05rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--couleur-couv);
+    border-bottom: 2px solid var(--texte);
+    padding-bottom: 0.4rem;
+  }
+  .ordre {
+    font-family: var(--police);
+    font-size: 0.75rem;
+    background: var(--couleur-couv);
+    color: #fff;
+    border-radius: 999px;
+    min-width: 1.6rem;
+    text-align: center;
+    padding: 0.05rem 0.4rem;
+  }
+  .surtitre {
+    margin: 0.35rem 0 0;
+    font-size: 0.78rem;
+    color: var(--texte-doux);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .illustration {
+    flex: 1;
+    min-height: 0;
+    margin: 0.8rem 0;
+    display: grid;
+    place-items: center;
+    background: color-mix(in srgb, var(--couleur-couv) 10%, white);
+    font-family: var(--police-titre);
+    font-size: 4.5rem;
+    color: var(--couleur-couv);
+    overflow: hidden;
+  }
+  .illustration :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  h3 {
+    margin: 0;
+    font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+  }
+  .texte {
+    margin: 0.4rem 0 0;
+    font-size: 0.9rem;
+    color: var(--texte-doux);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .etiquettes {
+    list-style: none;
+    margin: 0.6rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+  .etiquettes li {
+    font-size: 0.72rem;
+    border: 1px solid var(--couleur-couv);
+    color: var(--couleur-couv);
+    border-radius: 999px;
+    padding: 0 0.5rem;
+  }
+</style>

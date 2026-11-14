@@ -1,0 +1,27 @@
+/* Exemple : ce fichier écrase le style du site uniquement sur cette formation. */
+:root {
+  --accent: #6a1b9a;
+  --accent-fonce: #4a148c;
+  --accent-clair: #f3e5f5;
+}
+
+.grille-preparation {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+}
+.grille-preparation th,
+.grille-preparation td {
+  border: 1px solid var(--bordure);
+  padding: 0.5rem;
+  vertical-align: top;
+  text-align: left;
+}
+.grille-preparation th {
+  background: var(--accent-clair);
+}
+.grille-preparation textarea {
+  width: 100%;
+  font: inherit;
+  resize: vertical;
+}

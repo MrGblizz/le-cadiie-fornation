@@ -1,0 +1,45 @@
+# Formation : Créer une affiche militante
+nom: Créer une affiche militante
+resume: Concevoir une affiche lisible et percutante avec des logiciels libres.
+image: images/couverture.svg
+niveau: debutant
+themes: [Communication, Graphisme]
+dependances: []
+temps:
+  lecture: 15
+  pratique: 60
+  maitrise: 10
+modalite: maison
+date_ajout: 2026-11-02   # récente : apparaît dans « Nouvelles formations »
+
+contenu:
+  - titre: Une affiche, ça se lit en 3 secondes
+    texte: |
+      Les gens passent devant une affiche sans s'arrêter. Il faut donc :
+
+      - **un message principal** très court et très gros ;
+      - **une information pratique** (date, lieu, heure) ;
+      - **une signature** (qui appelle ?).
+
+  - titre: Les outils
+    texte: |
+      Pas besoin de logiciel payant : **Inkscape** ou **Krita** suffisent largement.
+      Retrouve-les dans la page [Ressources › Graphisme](/ressources/graphisme/).
+
+  - titre: À toi de jouer
+    texte: |
+      Réalise une affiche A4 pour une AG fictive. Montre-la à une personne qui ne connaît pas le sujet :
+      si elle comprend en 3 secondes de quoi il s'agit, c'est gagné.
+
+quiz_fin:
+  seuil: 60
+  questions:
+    - question: Combien de temps a-t-on pour capter l'attention avec une affiche ?
+      choix: ["Environ 3 secondes", "Environ 1 minute"]
+      reponse: 0
+    - question: Qu'est-ce qui doit apparaître sur une affiche d'appel ?
+      choix:
+        - Un message principal court
+        - La date, le lieu et l'heure
+        - Un long texte explicatif
+      reponse: [0, 1]

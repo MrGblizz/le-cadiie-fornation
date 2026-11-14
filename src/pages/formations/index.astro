@@ -1,0 +1,100 @@
+---
+import Base from '../../layouts/Base.astro';
+import CarteFormation from '../../components/CarteFormation.astro';
+import { MODALITES, NIVEAUX, estNouvelle, scorePopularite, slugifier, toutesLesFormations } from '../../lib/formations';
+
+const formations = await toutesLesFormations();
+
+const populaires = formations
+  .filter((f) => scorePopularite(f) > 0)
+  .sort((a, b) => scorePopularite(b) - scorePopularite(a))
+  .slice(0, 4);
+
+const nouvelles = formations
+  .filter((f) => estNouvelle(f))
+  .sort((a, b) => b.data.date_ajout!.getTime() - a.data.date_ajout!.getTime());
+
+const themes = [...new Set(formations.flatMap((f) => f.data.themes))].sort((a, b) => a.localeCompare(b, 'fr'));
+---
+
+<Base titre="Formations">
+  <Fragment slot="filtres">
+    <h2>Filtrer le catalogue</h2>
+    <fieldset>
+      <legend>Niveau</legend>
+      {
+        Object.entries(NIVEAUX).map(([valeur, label]) => (
+          <label>
+            <input type="checkbox" data-filtre="niveau" value={valeur} /> {label}
+          </label>
+        ))
+      }
+    </fieldset>
+    <fieldset>
+      <legend>Modalité</legend>
+      {
+        Object.entries(MODALITES).map(([valeur, m]) => (
+          <label title={m.long}>
+            <input type="checkbox" data-filtre="modalite" value={valeur} /> {m.court}
+          </label>
+        ))
+      }
+    </fieldset>
+    {
+      themes.length > 0 && (
+        <fieldset>
+          <legend>Thèmes</legend>
+          {themes.map((t) => (
+            <label>
+              <input type="checkbox" data-filtre="themes" value={slugifier(t)} /> {t}
+            </label>
+          ))}
+        </fieldset>
+      )
+    }
+    <p data-compteur></p>
+    <button type="button" class="bouton secondaire" data-reinitialiser>Réinitialiser</button>
+  </Fragment>
+
+  <header class="entete-page">
+    <h1>Les formations</h1>
+    <p>
+      Chaque formation indique son niveau, ses prérequis, le temps nécessaire et si elle peut se faire seul·e ou doit
+      être accompagnée sur le terrain.
+    </p>
+  </header>
+
+  {
+    populaires.length > 0 && (
+      <section class="section">
+        <h2>Les plus suivies et appréciées</h2>
+        <div class="grille-2">
+          {populaires.map((f) => (
+            <CarteFormation formation={f} />
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  {
+    nouvelles.length > 0 && (
+      <section class="section">
+        <h2>Nouvelles formations</h2>
+        <div class="grille-2">
+          {nouvelles.map((f) => (
+            <CarteFormation formation={f} badge="Nouveau" />
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section">
+    <h2>Catalogue</h2>
+    <div class="grille-2">
+      {formations.map((f) => <CarteFormation formation={f} filtrable badge={estNouvelle(f) ? 'Nouveau' : undefined} />)}
+    </div>
+    <p data-aucun-resultat hidden>Aucune formation ne correspond à ces filtres.</p>
+  </section>
+</Base>

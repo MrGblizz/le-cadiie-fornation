@@ -1,0 +1,74 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+export async function getStaticPaths() {
+  const categories = await getCollection('ressources');
+  return categories.map((c) => ({ params: { slug: c.id }, props: { categorie: c } }));
+}
+
+interface Props {
+  categorie: CollectionEntry<'ressources'>;
+}
+const { categorie } = Astro.props;
+const d = categorie.data;
+---
+
+<Base titre={d.titre} description={d.description}>
+  <p><a href="/ressources/">← Toutes les ressources</a></p>
+  <header class="entete-page">
+    <h1><span aria-hidden="true">{d.icone}</span> {d.titre}</h1>
+    <p>{d.description}</p>
+  </header>
+
+  <ul class="liens grille-2">
+    {
+      d.liens.map((l) => (
+        <li>
+          <a href={l.url} target="_blank" rel="noopener noreferrer">
+            <strong>{l.nom}</strong> ↗
+          </a>
+          {l.description && <p>{l.description}</p>}
+          <div class="meta">
+            {l.libre && <span class="pastille">Logiciel libre</span>}
+            {l.plateformes.map((p) => (
+              <span class="pastille plateforme">{p}</span>
+            ))}
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</Base>
+
+<style>
+  .liens {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .liens li {
+    background: var(--surface);
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    padding: 1rem 1.1rem;
+  }
+  .liens a {
+    font-size: 1.1rem;
+    text-decoration: none;
+  }
+  .liens p {
+    margin: 0.3rem 0 0.6rem;
+    color: var(--texte-doux);
+    font-size: 0.92rem;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+  .plateforme {
+    background: var(--fond);
+    color: var(--texte-doux);
+  }
+</style>

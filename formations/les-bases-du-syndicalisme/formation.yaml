@@ -1,0 +1,69 @@
+# Formation : Les bases du syndicalisme
+nom: Les bases du syndicalisme
+resume: Comprendre à quoi sert un syndicat, comment il fonctionne et pourquoi s'y engager quand on est jeune.
+image: images/couverture.svg
+niveau: debutant
+themes: [Syndicalisme, Droits]
+dependances: []
+temps:
+  lecture: 20      # minutes pour la lire
+  pratique: 45     # minutes pour la faire en la lisant
+  maitrise: 7      # jours de pratique pour la maîtriser
+modalite: maison   # terrain | support | maison
+date_ajout: 2026-03-01
+popularite:
+  suivis: 212
+  note: 4.7
+
+# Pas de prérequis : pas de quiz de début.
+
+contenu:
+  - titre: Un syndicat, c'est quoi ?
+    texte: |
+      Un **syndicat** est une organisation de personnes qui se regroupent pour **défendre leurs intérêts communs** :
+      conditions d'études ou de travail, droits, salaires, dignité.
+
+      Son principe est simple : seul·e, on pèse peu ; ensemble, on peut négocier, se protéger et obtenir des avancées.
+
+      > « L'union fait la force » n'est pas qu'un proverbe : c'est la base de toute organisation collective.
+
+  - titre: Comment ça fonctionne ?
+    texte: |
+      La plupart des syndicats reposent sur :
+
+      - des **adhérent·es** qui cotisent et décident ensemble ;
+      - des **instances** (assemblées générales, bureaux, congrès) où l'on débat et vote ;
+      - des **mandats** confiés à des élu·es, qui rendent compte de ce qu'ils et elles font.
+
+      L'**assemblée générale (AG)** est souvent le cœur de la vie démocratique d'un syndicat.
+
+  - titre: Pourquoi s'engager jeune ?
+    texte: |
+      S'engager tôt, c'est apprendre à connaître ses droits, rencontrer d'autres personnes qui veulent agir,
+      et acquérir des compétences utiles toute la vie : parler en public, organiser, convaincre.
+
+      **Exercice :** liste trois problèmes concrets dans ton école ou ton travail qui pourraient être réglés collectivement.
+
+quiz_fin:
+  seuil: 70
+  questions:
+    - question: Quel est le principe de base d'un syndicat ?
+      choix:
+        - Défendre collectivement des intérêts communs
+        - Organiser des soirées
+        - Remplacer la direction de l'établissement
+      reponse: 0
+      explication: Un syndicat regroupe des personnes pour défendre ensemble leurs intérêts.
+    - question: Où se prennent généralement les décisions collectives ?
+      choix:
+        - Dans le bureau du ou de la président·e uniquement
+        - En assemblée générale
+        - Sur les réseaux sociaux
+      reponse: 1
+    - question: Quels éléments font partie du fonctionnement d'un syndicat ?
+      choix:
+        - Des adhérent·es
+        - Des mandats confiés à des élu·es
+        - Un actionnaire principal
+      reponse: [0, 1]
+      explication: Un syndicat n'a pas d'actionnaires, ce n'est pas une entreprise.

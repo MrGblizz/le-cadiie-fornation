@@ -1,0 +1,69 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Couverture from '../../components/Couverture.astro';
+import { formatDate, slugifier } from '../../lib/formations';
+
+// Le plus récent en premier : il apparaît en haut à gauche.
+const numeros = (await getCollection('journal')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const sujets = [...new Set(numeros.flatMap((n) => n.data.sujets))].sort((a, b) => a.localeCompare(b, 'fr'));
+const annees = [...new Set(numeros.map((n) => String(n.data.date.getFullYear())))];
+---
+
+<Base titre="Journal">
+  <Fragment slot="filtres">
+    <h2>Filtrer le journal</h2>
+    <fieldset>
+      <legend>Sujets</legend>
+      {
+        sujets.map((s) => (
+          <label>
+            <input type="checkbox" data-filtre="sujets" value={slugifier(s)} /> {s}
+          </label>
+        ))
+      }
+    </fieldset>
+    {
+      annees.length > 1 && (
+        <fieldset>
+          <legend>Année</legend>
+          {annees.map((a) => (
+            <label>
+              <input type="checkbox" data-filtre="annee" value={a} /> {a}
+            </label>
+          ))}
+        </fieldset>
+      )
+    }
+    <p data-compteur></p>
+    <button type="button" class="bouton secondaire" data-reinitialiser>Réinitialiser</button>
+  </Fragment>
+
+  <header class="entete-page">
+    <h1>Le journal</h1>
+    <p>Les numéros du journal du Cadiie : actualités, réflexions et comptes rendus de luttes.</p>
+  </header>
+
+  <p class="indication">Sens de lecture : du plus récent (en haut à gauche) au plus ancien → puis ↓</p>
+
+  <div class="grille-2">
+    {
+      numeros.map((n, i) => (
+        <Couverture
+          href={`/journal/${n.id}/`}
+          bandeau="Le Cadiie — Journal"
+          surtitre={`N°${n.data.numero} · ${formatDate(n.data.date)}`}
+          titre={n.data.titre}
+          texte={n.data.resume}
+          etiquettes={n.data.sujets}
+          image={n.data.couverture}
+          icone={`N°${n.data.numero}`}
+          couleur={n.data.couleur}
+          ordre={i + 1}
+          filtres={{ sujets: n.data.sujets.map(slugifier).join(' '), annee: String(n.data.date.getFullYear()) }}
+        />
+      ))
+    }
+  </div>
+  <p data-aucun-resultat hidden>Aucun numéro ne correspond à ces filtres.</p>
+</Base>

@@ -1,0 +1,26 @@
+titre: Communication
+type: Services en ligne
+description: Se parler, s'organiser et se réunir à distance en toute sécurité.
+icone: "💬"
+ordre: 4
+liens:
+  - nom: Signal
+    url: https://signal.org/fr/
+    description: Messagerie chiffrée de bout en bout.
+    libre: true
+    plateformes: [Android, iOS, Windows, macOS, Linux]
+  - nom: Element (Matrix)
+    url: https://element.io/
+    description: Messagerie par salons, idéale pour les groupes de travail.
+    libre: true
+    plateformes: [Web, Android, iOS, Windows, macOS, Linux]
+  - nom: Jitsi Meet
+    url: https://meet.jit.si/
+    description: Visioconférence sans compte.
+    libre: true
+    plateformes: [Web, Android, iOS]
+  - nom: Framadate
+    url: https://framadate.org/
+    description: Sondages pour trouver une date de réunion.
+    libre: true
+    plateformes: [Web]

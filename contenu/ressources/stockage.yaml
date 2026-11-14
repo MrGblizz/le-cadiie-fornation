@@ -1,0 +1,21 @@
+titre: Stockage et partage
+type: Services en ligne
+description: Stocker et partager les documents, affiches et comptes rendus de l'organisation.
+icone: "🗄️"
+ordre: 3
+liens:
+  - nom: Nextcloud
+    url: https://nextcloud.com/fr/
+    description: Cloud auto-hébergeable (fichiers, agenda, contacts).
+    libre: true
+    plateformes: [Web, Windows, macOS, Linux, Android, iOS]
+  - nom: CryptPad
+    url: https://cryptpad.fr/
+    description: Documents collaboratifs chiffrés.
+    libre: true
+    plateformes: [Web]
+  - nom: Syncthing
+    url: https://syncthing.net/
+    description: Synchronisation de fichiers entre appareils, sans serveur central.
+    libre: true
+    plateformes: [Windows, macOS, Linux, Android]

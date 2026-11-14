@@ -1,0 +1,80 @@
+# Formation : Prendre la parole en AG
+nom: Prendre la parole en AG
+resume: Préparer et réussir une intervention claire et convaincante en assemblée générale.
+image: images/couverture.svg
+niveau: intermediaire
+themes: [Prise de parole, Assemblée générale]
+dependances:
+  - les-bases-du-syndicalisme
+temps:
+  lecture: 25
+  pratique: 90
+  maitrise: 21
+modalite: support   # support d'une formation physique
+date_ajout: 2026-05-12
+popularite:
+  suivis: 148
+  note: 4.5
+
+quiz_debut:
+  seuil: 60
+  questions:
+    - question: Qu'est-ce qu'une assemblée générale ?
+      choix:
+        - Une réunion où les membres débattent et votent
+        - Une réunion réservée à la direction
+        - Un document officiel
+      reponse: 0
+      dependance: les-bases-du-syndicalisme
+    - question: Un·e élu·e syndical·e…
+      choix:
+        - décide seul·e sans rendre de comptes
+        - exerce un mandat et rend compte aux adhérent·es
+      reponse: 1
+      dependance: les-bases-du-syndicalisme
+
+contenu:
+  - titre: Pourquoi préparer son intervention ?
+    texte: |
+      En AG, le temps de parole est court (souvent **2 à 3 minutes**). Une intervention préparée est
+      plus claire, plus courte et surtout plus **convaincante**.
+
+  - titre: La structure en trois temps
+    texte: |
+      Une bonne intervention suit souvent ce schéma :
+
+      1. **Le constat** — ce qui pose problème, avec un fait précis.
+      2. **L'argument** — pourquoi c'est important pour tout le monde.
+      3. **La proposition** — ce que tu proposes de faire, concrètement.
+    image: images/schema-intervention.svg
+    legende: Constat → argument → proposition.
+
+  - titre: Ta grille de préparation
+    texte: Imprime ou recopie cette grille, et remplis-la avant ta prochaine AG.
+    html: htmls/grille-preparation.html
+
+  - titre: S'entraîner
+    texte: |
+      Entraîne-toi à voix haute, chronomètre en main. Puis fais-le devant une ou deux personnes de confiance
+      et demande-leur ce qu'elles ont retenu.
+
+      *Cette partie sera travaillée en groupe lors de la formation physique.*
+    # video: https://www.youtube.com/watch?v=XXXXXXXXXXX   # exemple de vidéo externe
+    # son: sons/exemple-intervention.mp3                   # exemple de son local
+
+quiz_fin:
+  seuil: 70
+  questions:
+    - question: Dans quel ordre structurer une intervention ?
+      choix:
+        - Proposition, constat, argument
+        - Constat, argument, proposition
+        - Argument, proposition, constat
+      reponse: 1
+    - question: Combien de temps dure en général une intervention en AG ?
+      choix:
+        - 2 à 3 minutes
+        - 15 minutes
+        - Autant que nécessaire
+      reponse: 0
+      explication: Le temps de parole est limité pour que tout le monde puisse s'exprimer.

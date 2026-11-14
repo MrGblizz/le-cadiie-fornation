@@ -1,0 +1,58 @@
+# ============================================================
+#  MODÈLE DE FORMATION
+#  1. Copie ce dossier dans formations/ et renomme-le (ex. formations/ma-formation)
+#     → le nom du dossier devient l'adresse : /formations/ma-formation/
+#  2. Remplis ce fichier. Les chemins sont relatifs à ce dossier.
+# ============================================================
+
+nom: Nom de la formation
+resume: Une ou deux phrases qui donnent envie.
+image: images/couverture.png          # facultatif
+
+niveau: debutant                      # debutant | intermediaire | avance
+themes: [Thème 1, Thème 2]            # servent aux filtres
+
+dependances: []                       # noms de dossiers, ex. [les-bases-du-syndicalisme]
+
+temps:
+  lecture: 20                         # minutes pour la lire
+  pratique: 60                        # minutes pour la faire en la lisant
+  maitrise: 14                        # jours de pratique pour la maîtriser
+
+modalite: maison                      # terrain : doit être accompagnée d'une formation de terrain
+                                      # support : support d'une formation physique
+                                      # maison  : peut entièrement être faite à la maison
+
+date_ajout: 2026-01-01                # « Nouveau » pendant 45 jours
+popularite:                           # facultatif, saisi à la main
+  suivis: 0
+  note: 0                             # sur 5
+
+# Quiz de début : évalue les prérequis. Si le score est sous le seuil,
+# un message invite à réviser les formations « dependance » ratées.
+quiz_debut:
+  seuil: 70                           # % de bonnes réponses
+  questions:
+    - question: Question sur un prérequis ?
+      choix: [Réponse A, Réponse B, Réponse C]
+      reponse: 0                      # index de la bonne réponse (0 = la première)
+      dependance: nom-dossier-prerequis
+      explication: Facultatif, affiché après validation.
+
+contenu:
+  - titre: Première partie
+    texte: |
+      Texte en **Markdown** : listes, liens, gras, citations…
+    image: images/schema.png          # facultatif
+    legende: Légende de l'image
+  - titre: Deuxième partie
+    html: htmls/exercice.html         # facultatif : fragment HTML intégré à la page
+    video: https://www.youtube.com/watch?v=XXXXXXXXXXX   # ou PeerTube, ou videos/fichier.mp4
+    son: sons/extrait.mp3             # facultatif
+
+quiz_fin:
+  seuil: 70
+  questions:
+    - question: Question avec plusieurs bonnes réponses ?
+      choix: [A, B, C]
+      reponse: [0, 2]

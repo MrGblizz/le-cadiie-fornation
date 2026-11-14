@@ -1,0 +1,26 @@
+titre: Vidéo et son
+type: Logiciels
+description: Monter une vidéo, enregistrer un podcast ou diffuser une réunion en direct.
+icone: "🎬"
+ordre: 2
+liens:
+  - nom: Kdenlive
+    url: https://kdenlive.org/fr/
+    description: Montage vidéo complet.
+    libre: true
+    plateformes: [Windows, macOS, Linux]
+  - nom: Shotcut
+    url: https://shotcut.org/
+    description: Montage vidéo simple à prendre en main.
+    libre: true
+    plateformes: [Windows, macOS, Linux]
+  - nom: OBS Studio
+    url: https://obsproject.com/fr
+    description: Enregistrement d'écran et diffusion en direct.
+    libre: true
+    plateformes: [Windows, macOS, Linux]
+  - nom: Audacity
+    url: https://www.audacityteam.org/
+    description: Enregistrement et montage audio.
+    libre: true
+    plateformes: [Windows, macOS, Linux]

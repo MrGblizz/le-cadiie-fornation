@@ -1,0 +1,278 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import Quiz from '../../components/Quiz.astro';
+import {
+  MODALITES,
+  NIVEAUX,
+  formatDuree,
+  formatJours,
+  fragmentHtml,
+  markdown,
+  media,
+  stylesFormation,
+  toutesLesFormations,
+  video,
+} from '../../lib/formations';
+
+export async function getStaticPaths() {
+  const formations = await toutesLesFormations();
+  return formations.map((f) => ({ params: { slug: f.id }, props: { formation: f, toutes: formations } }));
+}
+
+interface Props {
+  formation: CollectionEntry<'formations'>;
+  toutes: CollectionEntry<'formations'>[];
+}
+const { formation, toutes } = Astro.props;
+const d = formation.data;
+const id = formation.id;
+
+const dependances = d.dependances.map((dep) => toutes.find((f) => f.id === dep)!);
+const debloque = toutes.filter((f) => f.data.dependances.includes(id));
+const css = stylesFormation(id);
+
+const sections = d.contenu.map((s, i) => ({
+  ancre: `section-${i + 1}`,
+  titre: s.titre,
+  texte: markdown(s.texte),
+  html: fragmentHtml(id, s.html),
+  image: s.image,
+  legende: s.legende,
+  video: video(id, s.video),
+  son: media(id, s.son),
+}));
+---
+
+<Base titre={d.nom} description={d.resume}>
+  {/* Placé dans le corps (et non dans <head>) pour passer après le CSS global et bien l'écraser. */}
+  {css && <Fragment set:html={`<style data-formation-style>${css}</style>`} />}
+
+  <Fragment slot="filtres">
+    <h2>Sommaire</h2>
+    <ol>
+      {d.quiz_debut && <li><a href="#quiz-debut">Quiz de début</a></li>}
+      {
+        sections.map((s) => (
+          <li>
+            <a href={`#${s.ancre}`}>{s.titre}</a>
+          </li>
+        ))
+      }
+      {d.quiz_fin && <li><a href="#quiz-fin">Quiz de fin</a></li>}
+    </ol>
+  </Fragment>
+
+  <article class={`formation formation-${id}`}>
+    <p><a href="/formations/">← Toutes les formations</a></p>
+
+    <header class="entete-formation">
+      {d.image && <Image src={d.image} alt="" class="couverture" width={900} />}
+      <div class="pastilles">
+        <span class={`pastille niveau-${d.niveau}`}>{NIVEAUX[d.niveau]}</span>
+        {d.themes.map((t) => <span class="pastille">{t}</span>)}
+      </div>
+      <h1>{d.nom}</h1>
+      <p class="resume">{d.resume}</p>
+
+      <dl class="infos">
+        <div>
+          <dt>📖 Lecture</dt>
+          <dd>{formatDuree(d.temps.lecture)}</dd>
+        </div>
+        <div>
+          <dt>✍️ En la faisant</dt>
+          <dd>{formatDuree(d.temps.pratique)}</dd>
+        </div>
+        <div>
+          <dt>🎯 Maîtrise</dt>
+          <dd>{formatJours(d.temps.maitrise)} de pratique</dd>
+        </div>
+      </dl>
+
+      <p class={`modalite modalite-${d.modalite}`}>
+        {d.modalite === 'terrain' ? '⚠️' : d.modalite === 'support' ? '🏫' : '🏠'}
+        {MODALITES[d.modalite].long}.
+      </p>
+
+      {
+        dependances.length > 0 && (
+          <p class="prerequis">
+            <strong>Prérequis :</strong>
+            {dependances.map((dep, i) => (
+              <>
+                {i > 0 && ', '}
+                <a href={`/formations/${dep.id}/`}>{dep.data.nom}</a>
+              </>
+            ))}
+          </p>
+        )
+      }
+    </header>
+
+    {
+      d.quiz_debut && (
+        <Quiz
+          type="debut"
+          formation={id}
+          quiz={d.quiz_debut}
+          dependances={dependances.map((dep) => ({ id: dep.id, nom: dep.data.nom }))}
+        />
+      )
+    }
+
+    {
+      sections.map((s) => (
+        <section class="section-formation" id={s.ancre}>
+          <h2>{s.titre}</h2>
+          {s.texte && <div class="prose" set:html={s.texte} />}
+          {s.html && <div class="fragment-html" set:html={s.html} />}
+          {s.image && (
+            <figure>
+              <Image src={s.image} alt={s.legende ?? ''} />
+              {s.legende && <figcaption>{s.legende}</figcaption>}
+            </figure>
+          )}
+          {s.video?.type === 'iframe' && (
+            <div class="video">
+              <iframe
+                src={s.video.src}
+                title={`Vidéo : ${s.titre}`}
+                loading="lazy"
+                allow="fullscreen; picture-in-picture"
+                allowfullscreen
+              />
+            </div>
+          )}
+          {s.video?.type === 'fichier' && <video src={s.video.src} controls preload="metadata" />}
+          {s.son && <audio src={s.son} controls preload="none" />}
+        </section>
+      ))
+    }
+
+    {d.quiz_fin && <Quiz type="fin" formation={id} quiz={d.quiz_fin} />}
+
+    {
+      debloque.length > 0 && (
+        <aside class="suite">
+          <h2>Et ensuite ?</h2>
+          <p>Cette formation ouvre la voie à :</p>
+          <ul>
+            {debloque.map((f) => (
+              <li>
+                <a href={`/formations/${f.id}/`}>{f.data.nom}</a> — {f.data.resume}
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )
+    }
+  </article>
+</Base>
+
+<style>
+  .entete-formation {
+    margin-bottom: 2.5rem;
+  }
+  .couverture {
+    width: 100%;
+    height: auto;
+    max-height: 320px;
+    object-fit: cover;
+    border-radius: var(--rayon);
+    margin-bottom: 1rem;
+  }
+  .pastilles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+  h1 {
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    margin: 0.5rem 0;
+  }
+  .resume {
+    font-size: 1.15rem;
+    color: var(--texte-doux);
+    max-width: 65ch;
+  }
+  .infos {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin: 1.25rem 0;
+  }
+  .infos div {
+    background: var(--surface);
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    padding: 0.6rem 0.8rem;
+  }
+  .infos dt {
+    font-size: 0.8rem;
+    color: var(--texte-doux);
+  }
+  .infos dd {
+    margin: 0;
+    font-weight: 700;
+  }
+  .modalite {
+    padding: 0.6rem 0.9rem;
+    border-radius: var(--rayon);
+    background: var(--accent-clair);
+  }
+  .modalite-terrain {
+    background: #fff3cd;
+    font-weight: 600;
+  }
+  .section-formation {
+    margin: 0 0 2.5rem;
+  }
+  .section-formation h2 {
+    font-size: 1.6rem;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 0.3rem;
+  }
+  figure {
+    margin: 1rem 0;
+  }
+  figure :global(img) {
+    height: auto;
+    border-radius: var(--rayon);
+  }
+  figcaption {
+    font-size: 0.85rem;
+    color: var(--texte-doux);
+  }
+  .video {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    margin: 1rem 0;
+  }
+  .video iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    border-radius: var(--rayon);
+  }
+  video,
+  audio {
+    display: block;
+    width: 100%;
+    margin: 1rem 0;
+  }
+  .suite {
+    background: var(--surface);
+    border: 1px dashed var(--accent);
+    border-radius: var(--rayon);
+    padding: 1rem 1.5rem;
+  }
+  @media (max-width: 640px) {
+    .infos {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,214 @@
+---
+interface Question {
+  question: string;
+  choix: string[];
+  reponse: number | number[];
+  explication?: string;
+  dependance?: string;
+}
+interface Props {
+  type: 'debut' | 'fin';
+  formation: string; // id de la formation
+  quiz: { seuil: number; questions: Question[] };
+  dependances?: { id: string; nom: string }[];
+}
+
+const { type, formation, quiz, dependances = [] } = Astro.props;
+
+const correction = quiz.questions.map((q) => ({
+  reponses: ([] as number[]).concat(q.reponse),
+  dependance: q.dependance ?? null,
+  explication: q.explication ?? null,
+}));
+const titre = type === 'debut' ? 'Quiz de début : es-tu prêt·e ?' : 'Quiz de fin de formation';
+const intro =
+  type === 'debut'
+    ? 'Ce petit quiz vérifie que tu as les bases nécessaires (les formations prérequises) avant de commencer.'
+    : 'Vérifie ce que tu as retenu. Tu peux recommencer autant de fois que tu veux.';
+---
+
+<section
+  class={`quiz quiz-${type}`}
+  id={`quiz-${type}`}
+  data-quiz={type}
+  data-formation={formation}
+  data-seuil={quiz.seuil}
+  data-correction={JSON.stringify(correction)}
+  data-dependances={JSON.stringify(dependances)}
+>
+  <h2>{titre}</h2>
+  <p class="intro">{intro} <small>(Seuil de réussite : {quiz.seuil} %)</small></p>
+  <form>
+    {
+      quiz.questions.map((q, i) => {
+        const multiple = Array.isArray(q.reponse) && q.reponse.length > 1;
+        return (
+          <fieldset class="question" data-index={i}>
+            <legend>
+              {i + 1}. {q.question}
+              {multiple && <small> (plusieurs réponses possibles)</small>}
+            </legend>
+            {q.choix.map((c, j) => (
+              <label>
+                <input type={multiple ? 'checkbox' : 'radio'} name={`${type}-q${i}`} value={j} /> {c}
+              </label>
+            ))}
+            <p class="explication" hidden />
+          </fieldset>
+        );
+      })
+    }
+    <div class="actions">
+      <button type="submit" class="bouton">Valider mes réponses</button>
+      <button type="reset" class="bouton secondaire">Recommencer</button>
+    </div>
+  </form>
+  <div class="resultat" role="status" aria-live="polite" hidden></div>
+</section>
+
+<script>
+  type Correction = { reponses: number[]; dependance: string | null; explication: string | null };
+
+  const echapper = (s: string) =>
+    s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+
+  document.querySelectorAll<HTMLElement>('[data-quiz]').forEach((bloc) => {
+    const type = bloc.dataset.quiz as 'debut' | 'fin';
+    const formation = bloc.dataset.formation!;
+    const seuil = Number(bloc.dataset.seuil);
+    const correction: Correction[] = JSON.parse(bloc.dataset.correction!);
+    const dependances: { id: string; nom: string }[] = JSON.parse(bloc.dataset.dependances!);
+    const form = bloc.querySelector('form')!;
+    const resultat = bloc.querySelector<HTMLElement>('.resultat')!;
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      let bonnes = 0;
+      const depsRatees = new Set<string>();
+
+      correction.forEach((c, i) => {
+        const fs = form.querySelector<HTMLFieldSetElement>(`[data-index="${i}"]`)!;
+        const choisies = [...fs.querySelectorAll<HTMLInputElement>('input:checked')].map((x) => Number(x.value)).sort();
+        const attendues = [...c.reponses].sort();
+        const juste = choisies.length === attendues.length && choisies.every((v, k) => v === attendues[k]);
+        if (juste) bonnes++;
+        else if (c.dependance) depsRatees.add(c.dependance);
+        fs.classList.toggle('juste', juste);
+        fs.classList.toggle('faux', !juste);
+        const exp = fs.querySelector<HTMLElement>('.explication')!;
+        exp.textContent = (juste ? '✔ ' : '✘ ') + (c.explication ?? (juste ? 'Bonne réponse.' : 'Ce n’est pas la bonne réponse.'));
+        exp.hidden = false;
+      });
+
+      const score = Math.round((bonnes / correction.length) * 100);
+      const reussi = score >= seuil;
+      let html = `<p class="score">${bonnes} / ${correction.length} bonnes réponses (${score} %)</p>`;
+
+      if (type === 'debut') {
+        if (reussi) {
+          html += '<p>✅ Tu as les bases nécessaires. Bonne formation !</p>';
+        } else {
+          const aReviser = dependances.filter((d) => depsRatees.size === 0 || depsRatees.has(d.id));
+          html += '<p>📚 <strong>Il te manque quelques bases.</strong> Nous t’invitons à réviser avant de commencer cette formation';
+          html += aReviser.length
+            ? ' :</p><ul>' +
+              aReviser.map((d) => `<li><a href="/formations/${d.id}/">${echapper(d.nom)}</a></li>`).join('') +
+              '</ul>'
+            : '.</p>';
+          html += '<p><small>Tu peux quand même continuer, mais la formation sera plus difficile à suivre.</small></p>';
+        }
+      } else {
+        if (reussi) {
+          html += '<p>🎉 <strong>Formation validée !</strong> Il ne reste plus qu’à pratiquer.</p>';
+          try {
+            localStorage.setItem(`cadiie:validee:${formation}`, new Date().toISOString());
+          } catch {}
+        } else {
+          html += '<p>Relis les sections où tu t’es trompé·e, puis retente le quiz.</p>';
+        }
+      }
+
+      resultat.innerHTML = html;
+      resultat.className = `resultat ${reussi ? 'reussi' : 'echec'}`;
+      resultat.hidden = false;
+      resultat.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+
+    form.addEventListener('reset', () => {
+      form.querySelectorAll('fieldset').forEach((fs) => {
+        fs.classList.remove('juste', 'faux');
+        fs.querySelector<HTMLElement>('.explication')!.hidden = true;
+      });
+      resultat.hidden = true;
+    });
+  });
+</script>
+
+<style>
+  .quiz {
+    background: var(--surface);
+    border: 1px solid var(--bordure);
+    border-left: 6px solid var(--accent);
+    border-radius: var(--rayon);
+    padding: 1.25rem 1.5rem;
+    margin: 0 0 3rem;
+  }
+  .quiz h2 {
+    margin-top: 0;
+  }
+  .intro {
+    color: var(--texte-doux);
+  }
+  .question {
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    margin: 0 0 1rem;
+    padding: 0.8rem 1rem;
+  }
+  .question legend {
+    font-weight: 600;
+    padding: 0 0.3rem;
+  }
+  .question label {
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+    padding: 0.2rem 0;
+    cursor: pointer;
+  }
+  .question input {
+    accent-color: var(--accent);
+  }
+  .question.juste {
+    border-color: var(--ok);
+    background: color-mix(in srgb, var(--ok) 6%, white);
+  }
+  .question.faux {
+    border-color: var(--ko);
+    background: color-mix(in srgb, var(--ko) 6%, white);
+  }
+  .explication {
+    margin: 0.4rem 0 0;
+    font-size: 0.9rem;
+  }
+  .actions {
+    display: flex;
+    gap: 0.6rem;
+  }
+  .resultat {
+    margin-top: 1rem;
+    padding: 0.8rem 1rem;
+    border-radius: var(--rayon);
+  }
+  .resultat.reussi {
+    background: color-mix(in srgb, var(--ok) 12%, white);
+  }
+  .resultat.echec {
+    background: color-mix(in srgb, var(--ko) 10%, white);
+  }
+  .resultat :global(.score) {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-top: 0;
+  }
+</style>

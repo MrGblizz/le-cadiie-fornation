@@ -1,0 +1,77 @@
+---
+import Sidebar from '../components/Sidebar.astro';
+import '../styles/global.css';
+
+interface Props {
+  titre?: string;
+  description?: string;
+}
+
+const {
+  titre,
+  description = 'Le Cadiie Formation : des formations, un journal et des ressources pour les jeunes militant·es et syndiqué·es.',
+} = Astro.props;
+const titreComplet = titre ? `${titre} · Le Cadiie Formation` : 'Le Cadiie Formation';
+const avecFiltres = Astro.slots.has('filtres');
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{titreComplet}</title>
+    <slot name="head" />
+  </head>
+  <body>
+    <div class="app">
+      <Sidebar avecFiltres={avecFiltres}>
+        <slot name="filtres" slot="filtres" />
+      </Sidebar>
+      <main class="contenu" id="contenu">
+        <slot />
+      </main>
+    </div>
+
+    <script>
+      // Filtres génériques de la barre latérale.
+      // <input type="checkbox" data-filtre="niveau" value="debutant">  filtre les
+      // éléments [data-filtrable] dont l'attribut data-niveau contient « debutant ».
+      // Dans un même groupe : OU ; entre groupes : ET.
+      function appliquerFiltres() {
+        const actifs: Record<string, string[]> = {};
+        document.querySelectorAll<HTMLInputElement>('input[data-filtre]:checked').forEach((i) => {
+          (actifs[i.dataset.filtre!] ??= []).push(i.value);
+        });
+        let visibles = 0;
+        const elements = document.querySelectorAll<HTMLElement>('[data-filtrable]');
+        elements.forEach((el) => {
+          const ok = Object.entries(actifs).every(([cle, valeurs]) => {
+            const siens = (el.dataset[cle] ?? '').split(' ');
+            return valeurs.some((v) => siens.includes(v));
+          });
+          el.hidden = !ok;
+          if (ok) visibles++;
+        });
+        document.querySelectorAll<HTMLElement>('[data-compteur]').forEach((c) => {
+          c.textContent = `${visibles} / ${elements.length} affiché${elements.length > 1 ? 's' : ''}`;
+        });
+        document.querySelectorAll<HTMLElement>('[data-aucun-resultat]').forEach((m) => {
+          m.hidden = visibles > 0;
+        });
+      }
+
+      document.addEventListener('change', (e) => {
+        if ((e.target as HTMLElement).matches('input[data-filtre]')) appliquerFiltres();
+      });
+      document.addEventListener('click', (e) => {
+        if (!(e.target as HTMLElement).closest('[data-reinitialiser]')) return;
+        document.querySelectorAll<HTMLInputElement>('input[data-filtre]').forEach((i) => (i.checked = false));
+        appliquerFiltres();
+      });
+      if (document.querySelector('[data-filtrable]')) appliquerFiltres();
+    </script>
+  </body>
+</html>

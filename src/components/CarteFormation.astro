@@ -1,0 +1,117 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import { MODALITES, NIVEAUX, formatDuree, formatJours, slugifier } from '../lib/formations';
+
+interface Props {
+  formation: CollectionEntry<'formations'>;
+  /** Si vrai, la carte réagit aux filtres de la barre latérale. */
+  filtrable?: boolean;
+  badge?: string;
+}
+const { formation, filtrable = false, badge } = Astro.props;
+const d = formation.data;
+---
+
+<a
+  class="carte-formation"
+  href={`/formations/${formation.id}/`}
+  data-filtrable={filtrable ? 'oui' : undefined}
+  data-niveau={d.niveau}
+  data-modalite={d.modalite}
+  data-themes={d.themes.map(slugifier).join(' ')}
+>
+  <div class="visuel">
+    {d.image ? <Image src={d.image} alt="" width={400} /> : <span aria-hidden="true">{d.nom.charAt(0)}</span>}
+  </div>
+  <div class="corps">
+    <div class="pastilles">
+      {badge && <span class="pastille nouveau">{badge}</span>}
+      <span class={`pastille niveau-${d.niveau}`}>{NIVEAUX[d.niveau]}</span>
+      <span class="pastille" title={MODALITES[d.modalite].long}>{MODALITES[d.modalite].court}</span>
+    </div>
+    <h3>{d.nom}</h3>
+    <p>{d.resume}</p>
+    <ul class="temps">
+      <li title="Temps de lecture">📖 {formatDuree(d.temps.lecture)}</li>
+      <li title="Temps pour la faire en la lisant">✍️ {formatDuree(d.temps.pratique)}</li>
+      <li title="Pratique pour la maîtriser">🎯 {formatJours(d.temps.maitrise)}</li>
+    </ul>
+  </div>
+</a>
+
+<style>
+  .carte-formation {
+    display: grid;
+    grid-template-columns: 38% 1fr;
+    min-height: 190px;
+    background: var(--surface);
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    overflow: hidden;
+    color: var(--texte);
+    text-decoration: none;
+    transition:
+      transform 0.15s,
+      box-shadow 0.15s;
+  }
+  .carte-formation:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgb(0 0 0 / 0.08);
+  }
+  .visuel {
+    background: var(--accent-clair);
+    display: grid;
+    place-items: center;
+    font-family: var(--police-titre);
+    font-size: 3rem;
+    color: var(--accent);
+  }
+  .visuel :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .corps {
+    padding: 0.9rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .pastilles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+  h3 {
+    margin: 0.2rem 0 0;
+    font-size: 1.15rem;
+  }
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--texte-doux);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .temps {
+    margin: auto 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.8rem;
+    font-size: 0.8rem;
+    color: var(--texte-doux);
+  }
+  @media (max-width: 1000px) {
+    .carte-formation {
+      grid-template-columns: 1fr;
+    }
+    .visuel {
+      aspect-ratio: 16 / 7;
+    }
+  }
+</style>

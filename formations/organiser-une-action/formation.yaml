@@ -1,0 +1,71 @@
+# Formation : Organiser une action
+nom: Organiser une action
+resume: De l'idée au jour J — planifier, mobiliser et sécuriser une action collective (rassemblement, distribution de tracts…).
+image: images/couverture.svg
+niveau: avance
+themes: [Mobilisation, Organisation]
+dependances:
+  - les-bases-du-syndicalisme
+  - prendre-la-parole-en-ag
+temps:
+  lecture: 40
+  pratique: 180
+  maitrise: 60
+modalite: terrain   # doit absolument être accompagnée d'une formation de terrain
+date_ajout: 2026-06-20
+popularite:
+  suivis: 87
+  note: 4.8
+
+quiz_debut:
+  seuil: 70
+  questions:
+    - question: Quelle est la structure conseillée pour une intervention en AG ?
+      choix:
+        - Constat, argument, proposition
+        - Introduction, développement, conclusion, annexe
+      reponse: 0
+      dependance: prendre-la-parole-en-ag
+    - question: Pourquoi s'organiser collectivement ?
+      choix:
+        - Parce qu'ensemble on pèse davantage
+        - Parce que c'est obligatoire
+      reponse: 0
+      dependance: les-bases-du-syndicalisme
+
+contenu:
+  - titre: Définir un objectif clair
+    texte: |
+      Une action n'est pas une fin en soi : elle sert un **objectif**. Avant tout, réponds à trois questions :
+
+      - **Quoi ?** Qu'est-ce qu'on veut obtenir ?
+      - **Qui ?** Qui peut nous l'accorder, et qui doit-on mobiliser ?
+      - **Quand ?** À quel moment l'action aura-t-elle le plus d'impact ?
+
+  - titre: Mobiliser
+    texte: |
+      Fais circuler l'information **tôt** et par plusieurs canaux : bouche-à-oreille, affiches, messageries.
+      Répartis les rôles : communication, logistique, prise de parole, sécurité, contact avec la presse.
+
+  - titre: Le jour J
+    texte: |
+      Prévois un point de rendez-vous, un·e référent·e par équipe et un **temps de bilan** après l'action.
+
+      ⚠️ Les aspects légaux et de sécurité (déclaration, droits face aux forces de l'ordre…) sont abordés
+      **uniquement en formation de terrain**, avec des camarades expérimenté·es.
+
+quiz_fin:
+  seuil: 70
+  questions:
+    - question: Que faut-il définir en premier ?
+      choix:
+        - Le slogan
+        - L'objectif de l'action
+        - La couleur des banderoles
+      reponse: 1
+    - question: Quels rôles peut-on répartir dans l'équipe ?
+      choix:
+        - Communication
+        - Logistique
+        - Prise de parole
+      reponse: [0, 1, 2]

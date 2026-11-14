@@ -1,0 +1,129 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Couverture from '../components/Couverture.astro';
+import { formatDate, toutesLesFormations } from '../lib/formations';
+
+const numeros = (await getCollection('journal')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const dernier = numeros[0];
+const formations = await toutesLesFormations();
+const pourCommencer = formations.filter((f) => f.data.niveau === 'debutant' && f.data.dependances.length === 0);
+
+// Extrait : les premiers paragraphes du dernier numéro
+const extrait = dernier?.body
+  ?.split(/\n\s*\n/)
+  .map((p) => p.trim())
+  .filter((p) => p && !p.startsWith('#'))
+  .slice(0, 2);
+---
+
+<Base>
+  <section class="accueil-intro">
+    <p class="surtitre">Bienvenue</p>
+    <h1>Entre dans le monde du militantisme.</h1>
+    <div class="prose">
+      <p>
+        <strong>Le Cadiie Formation</strong> est un espace pensé pour les jeunes militant·es et syndiqué·es, ou pour celles et
+        ceux qui se demandent simplement comment on fait pour changer les choses autour de soi.
+      </p>
+      <p>
+        Ici, pas besoin d'avoir déjà tout lu ni d'avoir déjà tout fait. Chaque formation part de ce que tu sais, te dit
+        ce qu'il faut connaître avant, et t'accompagne jusqu'à la pratique — chez toi, en complément d'une formation
+        physique, ou sur le terrain avec les camarades.
+      </p>
+      <p>Lis le journal, choisis une formation, pioche dans les ressources : le reste s'apprend ensemble.</p>
+    </div>
+    <div class="actions">
+      <a class="bouton" href="/formations/">Voir les formations</a>
+      <a class="bouton secondaire" href="/journal/">Lire le journal</a>
+    </div>
+  </section>
+
+  {
+    dernier && (
+      <section class="section">
+        <h2>Extrait du journal</h2>
+        <div class="extrait">
+          <Couverture
+            href={`/journal/${dernier.id}/`}
+            bandeau="Le Cadiie — Journal"
+            surtitre={`N°${dernier.data.numero} · ${formatDate(dernier.data.date)}`}
+            titre={dernier.data.titre}
+            etiquettes={dernier.data.sujets}
+            image={dernier.data.couverture}
+            icone={`N°${dernier.data.numero}`}
+            couleur={dernier.data.couleur}
+          />
+          <div class="prose">
+            <p class="chapo">{dernier.data.resume}</p>
+            {extrait?.map((p) => <p>{p}</p>)}
+            <a class="bouton" href={`/journal/${dernier.id}/`}>
+              Lire la suite du n°{dernier.data.numero}
+            </a>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    pourCommencer.length > 0 && (
+      <section class="section">
+        <h2>Pour commencer</h2>
+        <ul class="liste-debut">
+          {pourCommencer.map((f) => (
+            <li>
+              <a href={`/formations/${f.id}/`}>{f.data.nom}</a> — {f.data.resume}
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+</Base>
+
+<style>
+  .accueil-intro {
+    margin-bottom: 3rem;
+  }
+  .surtitre {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-size: 0.8rem;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  h1 {
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    margin: 0.3rem 0 1rem;
+    max-width: 18ch;
+  }
+  .prose p {
+    font-size: 1.05rem;
+  }
+  .actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+  }
+  .extrait {
+    display: grid;
+    grid-template-columns: minmax(220px, 300px) 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+  .chapo {
+    font-weight: 600;
+    font-size: 1.15rem !important;
+  }
+  .liste-debut li {
+    margin: 0.4rem 0;
+  }
+  @media (max-width: 700px) {
+    .extrait {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
